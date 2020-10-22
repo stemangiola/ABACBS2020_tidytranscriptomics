@@ -1,0 +1,9 @@
+.Rproj.user
+doc
+Meta
+.RData
+.Rhistory
+*.Rproj
+ABACBS2020tidytranscriptomics.Rcheck/
+ABACBS2020tidytranscriptomics*.tar.gz
+ABACBS2020tidytranscriptomics*.tgz

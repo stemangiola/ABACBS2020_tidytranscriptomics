@@ -1,0 +1,14 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^doc$
+^Meta$
+^LICENSE\.md$
+.github
+Dockerfile
+_pkgdown.yml
+^data-raw$
+dev$
+CONTRIBUTING.md
+^ABACBS2020tidytranscriptomics\.Rcheck$
+^ABACBS2020tidytranscriptomics.*\.tar\.gz$
+^ABACBS2020tidytranscriptomics.*\.tgz$
