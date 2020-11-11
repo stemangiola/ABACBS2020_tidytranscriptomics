@@ -83,7 +83,7 @@ Topics in bold we will see in this workshop
 # Bulk RNA sequencing differential expression workflow
 
 ```{r, echo=FALSE, out.width = "600px"}
-knitr::include_graphics("../inst/vignettes/bulk_RNASeq_pipeline.png")
+knitr::include_graphics("../inst/vignettes/bulk_RNAseq_pipeline.png")
 ```
 
 # Differences between bulk and single-cell RNA sequencing
@@ -97,7 +97,7 @@ _Shalek and Benson, 2017_
 # Single-cell RNA sequencing analysis workflow
 
 ```{r, echo=FALSE, out.width = "600px"}
-knitr::include_graphics("../inst/vignettes/single_cell_RNASeq_pipeline.png")
+knitr::include_graphics("../inst/vignettes/single_cell_RNAseq_pipeline.png")
 ```
 
 # Getting started 
