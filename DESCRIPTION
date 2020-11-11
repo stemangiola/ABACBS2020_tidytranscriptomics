@@ -1,6 +1,6 @@
 Package: ABACBS2020tidytranscriptomics
 Title: Introduction to Tidy Transcriptomics
-Version: 1.1.0
+Version: 0.1.0
 Authors@R: c(
     person("Maria", "Doyle", email="maria.doyle@petermac.org",
     role = c("aut"),
@@ -45,7 +45,10 @@ Imports:
     GGally,
     plotly,
     survival,
-    SingleR
+    SingleR,
+    igraph,
+    acepack,
+    e1071
 Suggests:
     knitr,
     rmarkdown,
