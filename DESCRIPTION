@@ -48,7 +48,8 @@ Imports:
     SingleR,
     igraph,
     acepack,
-    e1071
+    e1071,
+    broom
 Suggests:
     knitr,
     rmarkdown,
