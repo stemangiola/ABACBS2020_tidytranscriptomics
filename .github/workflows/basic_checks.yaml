@@ -2,7 +2,7 @@ on: [push]
 jobs:
   job1:
     runs-on: ubuntu-latest
-    container: bioconductor/bioconductor_docker:devel
+    container: bioconductor/bioconductor_docker:RELEASE_3_12
     steps:
       - uses: actions/checkout@v1
 
@@ -11,10 +11,10 @@ jobs:
           install.packages('remotes')
           
           # We'll install the specific versions from the install instructions
-          BiocManager::install("stemangiola/tidybulk@v1.1.8", version="devel")
-          BiocManager::install("stemangiola/tidygate@v0.2.8", version="devel")
-          BiocManager::install("stemangiola/tidyseurat@v0.1.8", version="devel")
-          BiocManager::install("stemangiola/tidyHeatmap@v1.1.5", version="devel")
+          BiocManager::install("stemangiola/tidybulk@v1.2.0")
+          BiocManager::install("stemangiola/tidygate@v0.2.8")
+          BiocManager::install("stemangiola/tidyseurat@v0.1.16")
+          BiocManager::install("stemangiola/tidyHeatmap@v1.1.5")
           
           # Then install the other dependencies in the usual way
           options(repos = c(CRAN = 'https://cran.r-project.org'))
