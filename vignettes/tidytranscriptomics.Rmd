@@ -67,7 +67,9 @@ Measuring gene expression on a genome-wide scale has become common practice over
 There are many steps involved in analysing an RNA sequencing dataset. Sequenced reads are aligned to a reference genome, then the number of reads mapped to each gene can be counted. This results in a table of counts, which is what we perform statistical analyses on in R. While mapping and counting are important and necessary tasks, today we will be starting from the count data and showing how differential expression analysis can be performed in a friendly way using the Bioconductor package, tidybulk.
 
 
-First, let’s load all the packages we will need to analyse the data. Note that you should load the *tidybulk* library after the tidyverse core packages for best integration.
+First, let’s load all the packages we will need to analyse the data. 
+
+_Note: you should load the *tidybulk* library after the tidyverse core packages for best integration._
 
 ```{r message=FALSE, warning=FALSE}
 # load libraries
@@ -86,6 +88,7 @@ library(ggplot2)
 # tidyverse-friendly packages
 library(plotly)
 library(ggrepel)
+library(GGally)
 library(tidyHeatmap)
 library(tidybulk)
 ```
@@ -117,10 +120,9 @@ custom_theme <-
   )
 ```
 
-### Airway RNA sequencing dataset
-Here we will perform our analysis using the data from the *airway* package. The airway data comes from the paper by [@himes2014rna]; and it includes 8 samples from human airway smooth muscle cells, from 4 cell lines. For each cell line treated (with dexamethasone) and untreated (negative control) a sample has undergone RNA sequencing and gene counts have been generated.
-
 ### Setting up the data
+
+Here we will perform our analysis using the data from the *airway* package. The airway data comes from the paper by [@himes2014rna]; and it includes 8 samples from human airway smooth muscle cells, from 4 cell lines. For each cell line treated (with dexamethasone) and untreated (negative control) a sample has undergone RNA sequencing and gene counts have been generated.
 
 The airway data is stored as a Bioconductor *RangedSummarizedExperiment* object. We will convert this object into a tidybulk tibble. A tibble is the tidyverse table format.
 
@@ -134,47 +136,32 @@ data(airway)
 counts_airway <-
 	airway %>%
 	tidybulk()
-```
 
-We can type the name of the object to view.
-
-```{r}
+# take a look
 counts_airway
 ```
 
+
 The `counts_airway` object contains information about genes and samples, the first column has the Ensembl gene identifier, the second column has the sample identifier and the third column has the gene transcription abundance. The abundance is the number of reads aligning to the gene in each experimental sample. The remaining columns include sample-wise information. The dex column tells us whether the samples are treated or untreated and the cell column tells us what cell line they are from.
-
 We can shorten the sample names. We can remove the SRR1039 prefix that's present in all of them, as shorter names can fit better in some of the plots we will create. We can use `mutate()` together with `str_replace()` to remove the SRR1039 string from the sample column.
-
-```{r}
-counts_format <- counts_airway %>%
-  mutate(sample=str_remove(sample, "SRR1039"))
-```
-
-
-### Adding gene symbols
-
 We can get the gene symbols for these Ensembl gene ids using the Bioconductor annotation package for human, `org.Hs.eg.db` and add them as a column using `mutate` again.
-
-```{r}
-counts_tt <- counts_format %>% 
-  mutate(symbol = AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, keys = as.character(feature), keytype = "ENSEMBL", column="SYMBOL", multiVals = "first"))
-
-counts_tt
-```
-
-With tidyverse, all above operations can be linked with the `%>%`, as shown below. This has the benefits that
-
+With tidyverse, all above steps can be linked with the `%>%`, as shown below. This has the benefits that
 * no temporary variables need to be created
 * less typing is required
 * the steps can be seen more clearly.
-
 ```{r}
+# setup data workflow
 counts_tt <- 	
 	airway %>%
 	tidybulk() %>%
 	mutate(sample=str_remove(sample, "SRR1039")) %>%
-	mutate(symbol = AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, keys = as.character(feature), keytype = "ENSEMBL", column="SYMBOL", multiVals = "first"))
+	mutate(symbol = AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, 
+	                                      keys = as.character(feature), 
+	                                      keytype = "ENSEMBL", 
+	                                      column="SYMBOL", 
+	                                      multiVals = "first"))
+# take a look
+counts_tt
 ```
 
 From this tidybulk tibble, we can perform differential expression analysis with the tidybulk package.
@@ -211,7 +198,11 @@ We can visualise the difference of abundance densities before and after scaling.
 
 ```{r out.width = "70%"}
 counts_scaled %>%
+    
+    # Reshaping
 	pivot_longer(cols = c("counts", "counts_scaled"), names_to = "source", values_to = "abundance") %>%
+    
+    # Plotting
 	ggplot(aes(x=abundance + 1, color=sample)) +
 	geom_density() +
 	facet_wrap(~source) +
@@ -246,6 +237,7 @@ airway %>%
 # Example code, no need to run
 
 # Prepare data set
+library(edgeR)
 dgList <- SE2DGEList(airway)
 group <- factor(dgList$samples$dex)
 keep.exprs <- filterByExpr(dgList, group=group)
@@ -331,11 +323,11 @@ The samples separate by treatment on PC1 which is what we hope to see. PC2 separ
 An alternative to principal component analysis for examining relationships between samples is using hierarchical clustering. Heatmaps are a nice visualisation to examine hierarchical clustering of your samples. tidybulk has a simple function we can use, `keep_variable`, to extract the most variable genes which we can then plot with tidyHeatmap.
 
 ```{r out.width = "70%"}
-counts_scaled %>%
-
+counts_scal_PCA %>%
+    
 	# extract 500 most variable genes
 	keep_variable(.abundance = counts_scaled, top = 500) %>%
-
+    
 	# create heatmap
 	heatmap(
 	      .column = sample,
@@ -343,8 +335,8 @@ counts_scaled %>%
 	      .value = counts_scaled,
 	      transform = log1p
 	) %>%
-        add_tile(dex) %>%
-        add_tile(cell)
+  add_tile(dex) %>%
+  add_tile(cell)
 ```
 
 In the heatmap we can see the samples cluster into two groups, treated and untreated, for three of the cell lines, and the cell line (N080611) again is further away from the others.
@@ -355,6 +347,7 @@ Tidybulk enables a simplified way of generating a clustered heatmap of variable 
 ```{r eval=FALSE}
 # Example code, no need to run
 
+library(edgeR)
 dgList <- SE2DGEList(airway)
 group <- factor(dgList$samples$dex)
 keep.exprs <- filterByExpr(dgList, group=group)
