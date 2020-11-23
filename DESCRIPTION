@@ -49,7 +49,10 @@ Imports:
     igraph,
     acepack,
     e1071,
-    broom
+    broom,
+    scuttle,
+    EnsDb.Hsapiens.v86,
+    celldex
 Suggests:
     knitr,
     rmarkdown,
