@@ -18,7 +18,7 @@
 
 Material [web page](https://stemangiola.github.io/ABACBS2020_tidytranscriptomics/articles/tidytranscriptomics.html).
 
-This material was created for the R/Pharma2020 conference workshop but it can also be used for self-learning.
+This material was created for the ABACBS conference workshop but it can also be used for self-learning.
 
 More details on the workshop are below.
 
@@ -62,25 +62,27 @@ To run the code, you could then copy and paste the code from the workshop vignet
 
 This workshop will present how to perform analysis of RNA sequencing data following the tidy data paradigm. The tidy data paradigm provides a standard way to organise data values within a dataset, where each variable is a column, each observation is a row, and data is manipulated using an easy-to-understand vocabulary. Most importantly, the data structure remains consistent across manipulation and analysis functions.
 
-This can be achieved for RNA sequencing data with the [tidybulk](https://stemangiola.github.io/tidybulk/), [tidyseurat](https://stemangiola.github.io/tidyseurat/),  [tidyHeatmap](https://stemangiola.github.io/tidyHeatmap/) and [tidyverse](https://www.tidyverse.org/) packages. The tidybulk package provides a tidy data structure and a modular framework for bulk transcriptional analyses, the tidyseurat package provides similar for single-cell transcriptional analyses, and tidyHeatmap provides a tidy implementation of ComplexHeatmap. These packages are part of the tidytranscriptomics suite that introduces a tidy approach to RNA sequencing data.
+This can be achieved for RNA sequencing data with the [tidybulk](https://stemangiola.github.io/tidybulk/), [tidyseurat](https://stemangiola.github.io/tidyseurat/), [tidySingleCellExperiment](https://stemangiola.github.io/tidySingleCellExperiment/),  [tidyHeatmap](https://stemangiola.github.io/tidyHeatmap/) and [tidyverse](https://www.tidyverse.org/) packages. The tidybulk package provides a tidy data structure and a modular framework for bulk transcriptional analyses, the tidyseurat package provides similar for single-cell transcriptional analyses, and tidyHeatmap provides a tidy implementation of ComplexHeatmap. These packages are part of the tidytranscriptomics suite that introduces a tidy approach to RNA sequencing data.
 
 ### Pre-requisites
 
 * Basic knowledge of RStudio
-* Familiarity with tidyverse syntax
+* Some familiarity with tidyverse syntax
+* Some familiarity with bulk RNA-seq and single cell RNA-seq
 
 Recommended Background Reading
 [Introduction to R for Biologists](https://melbournebioinformatics.github.io/r-intro-biologists/intro_r_biologists.html)
 
 ### Workshop Participation
 
-The workshop format is a 3 hour session consisting of hands-on demos, exercises and Q&A.
+The workshop format is a 3.5 hour session consisting of hands-on demos, exercises and Q&A.
 
 ### _R_ / _Bioconductor_ packages used
 
 * tidyverse
 * tidybulk
 * tidyseurat
+* tidySingleCellExperiment
 * tidyHeatmap
 * tidygate
 * limma
@@ -102,25 +104,18 @@ Rough guide
 | Activity                                              | Time |
 |-------------------------------------------------------|------|
 | **Part 1 Bulk RNA-seq Core**                          |      |
-|  *Hands-on Demos*                                     |  50m |
-|      Introduction to RNA-seq                          |      |
+|  *Hands-on Demos*                                     |  90m |
 |      Data preprocessing                               |      |
 |      Data dimensionality reduction and clustering     |      |
 |      Differential gene expression                     |      |
-|      Data visualisation                               |      |
-|  *Exercises and Q&A*                                  |  10m |
-| _Break_                                               |   5m |
-| **Part 2 Bulk RNA-seq Extended**                      |      |
-|  *Hands-on Demos*                                     |  40m |
-|      Comparison of differential testing tools         |      |
 |      Cell type composition analysis                   |      |
-|  *Q&A*                                                |  10m |
-| _Break_                                               |   5m |
-| **Part 3 Single-cell RNA-seq**                        |      |
-|  *Hands-on Demos*                                     |  30m |
-|      Introduction to single-cell                      |      |
-| **Additional Q&A**                                    |  30m |
-| Total                                                 | 180m |
+| _Break_                                               |  30m |
+| **Part 2 Single-cell RNA-seq**                        |      |
+|  *Hands-on Demos*                                     |  90m |
+|      Introduction to tidyseurat                       |      |
+|      Introduction to tidySingleCellExperiment         |      |
+|      Pseudobulk analysis                              |      |
+| Total                                                 | 220m |
 
 ### Workshop goals and objectives
 
@@ -131,7 +126,7 @@ The tidytranscriptomics approach to RNA sequencing data analysis abstracts out t
 #### Learning goals
 
 * To understand the key concepts and steps of RNA sequencing data analysis
-* To approach data representation and analysis though a tidy data paradigm, integrating tidyverse with tidybulk, tidyseurat and tidyHeatmap.
+* To approach data representation and analysis though a tidy data paradigm, integrating tidyverse with tidybulk, tidyseurat, tidySingleCellExperiment and tidyHeatmap.
 
 #### Learning objectives
 
