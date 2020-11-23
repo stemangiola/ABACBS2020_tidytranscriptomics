@@ -898,7 +898,7 @@ pbmc_small_nested_reanalysed
 
 ## tidySingleCellExperiment
 
-SingleCellExperiment is a very popular container for single cell RNA sequencing data [@sce]. tidySingleCellExperiemnt provides a bridge between the SingleCellExperiment single-cell package [@sce] and the tidyverse [@wickham2019welcome]. It enables the display of the
+SingleCellExperiment is a very popular container for single cell RNA sequencing data [@sce]. tidySingleCellExperiment provides a bridge between the SingleCellExperiment single-cell package [@sce] and the tidyverse [@wickham2019welcome]. It enables the display of the
 SingleCellExperiment object as a tidyverse tibble, and provides SingleCellExperiment-compatible *dplyr*, *tidyr*, *ggplot* and *plotly* functions.
 
 
@@ -914,11 +914,11 @@ library(scater)
 library(scran)
 library(igraph)
 library(SingleR)
-library(tidySingleCellExperiemnt)
+library(tidySingleCellExperiment)
 ```
 
 
-## Create `tidySingleCellExperiemnt`
+## Create `tidySingleCellExperiment`
 
 This is a SingleCellExperiment object but it is evaluated as tibble. So it is fully compatible both with SingleCellExperiment and tidyverse APIs. 
 
@@ -1015,7 +1015,7 @@ pbmc_small_pca
 
 ```
 
-If a tidyverse-compatible package is not included in the tidySingleCellExperiemnt collection, we can use `as_tibble` to permanently convert `tidySingleCellExperiemnt` into a tibble.
+If a tidyverse-compatible package is not included in the tidySingleCellExperiment collection, we can use `as_tibble` to permanently convert `tidySingleCellExperiment` into a tibble.
 
 ```{r pc_plot, message=FALSE}
 # Create pairs plot with GGally
@@ -1174,7 +1174,7 @@ pbmc_small_cell_type %>%
 
 ##  Nested analyses
 
-A powerful tool we can use with tidySingleCellExperiemnt is `nest`. We can easily perform independent analyses on subsets of the dataset. First we classify cell types in lymphoid and myeloid; then, nest based on the new classification
+A powerful tool we can use with tidySingleCellExperiment is `nest`. We can easily perform independent analyses on subsets of the dataset. First we classify cell types in lymphoid and myeloid; then, nest based on the new classification
 
 ```{r}
 pbmc_small_nested <-
@@ -1210,8 +1210,8 @@ mutate(variable_genes = map_chr(
 - Some basic steps of a single-cell RNA sequencing analysis are dimensionality reduction, cluster identification and cell type classification
 - `tidyseurat` is an invisible layer that operates on a `Seurat` object and enables us to visualise and manipulate data as if it were a tidy data frame.
 - `tidyseurat` object is a `Seurat object` so it can be used with any `Seurat` compatible method
-- `tidySingleCellExperiemnt` is an invisible layer that operates on a `SingleCellExperiment` object and enables us to visualise and manipulate data as if it were a tidy data frame.
-- `tidySingleCellExperiemnt` object is a `SingleCellExperiment object` so it can be used with any `SingleCellExperiment` compatible method
+- `tidySingleCellExperiment` is an invisible layer that operates on a `SingleCellExperiment` object and enables us to visualise and manipulate data as if it were a tidy data frame.
+- `tidySingleCellExperiment` object is a `SingleCellExperiment object` so it can be used with any `SingleCellExperiment` compatible method
 
 # Contributing
 If you want to suggest improvements for this workshop or ask questions, you can do so as described [here](https://github.com/stemangiola/ABACBS2020_tidytranscriptomics/blob/master/CONTRIBUTING.md).
