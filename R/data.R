@@ -1,3 +1,11 @@
+#' BRCA
+#'
+#' Subset of the TCGA BRCA data set
+#'
+#' @format  A tidy data frame.
+#' @usage data(BRCA)
+"BRCA"
+
 #' pasilla
 #'
 #' pasilla gene count data in SummarizedExperiment format
@@ -7,35 +15,35 @@
 #' @usage data(pasilla)
 "pasilla"
 
-#' de_gate_gates
+#' pbmc_small_seurat
 #'
-#' Stefano's gate list
-#'
-#' @format  A list of gates to use. Gates consist of x and y coordinates.
-#' @usage data(de_gate_gates)
-"de_gate_gates"
-
-
-#' cell_type_df
-#'
-#' Stefano's cell type df
-#'
-#' @format  A list of gates to use. Gates consist of x and y coordinates.
-#' @usage data(cell_type_df)
-"cell_type_df"
-
-#' BRCA
-#'
-#' Subset of the TCGA BRCA data set
-#'
-#' @format  A tidy data frame.
-#' @usage data(BRCA)
-"BRCA"
-
-#' pbmc_small
-#'
-#' A small Seurat dadaset of single cell RNA sequencing data
+#' A small Seurat dataset of single cell RNA sequencing data
 #'
 #' @format  A Seurat object.
-#' @usage data(pbmc_small)
-"pbmc_small"
+#' @usage data(pbmc_small_seurat)
+"pbmc_small_seurat"
+
+
+#' pbmc_small_sce
+#'
+#' A small SingleCellExperiment dataset of single cell RNA sequencing data
+#'
+#' @format  A SingleCellExperiment object.
+#' @usage data(pbmc_small_sce)
+"pbmc_small_sce"
+
+#' cell_type_df_seurat
+#'
+#' Stefano's cell type df for tidyseurat
+#'
+#' @format  A tibble containing two columns: seurat_clusters and first.labels
+#' @usage data(cell_type_df_seurat)
+"cell_type_df_seurat"
+
+#' cell_type_df_sce
+#'
+#' Stefano's cell type df for tidySingleCellExperiment
+#'
+#' @format  A tibble containing two columns: label and first.labels
+#' @usage data(cell_type_df_sce)
+"cell_type_df_sce"

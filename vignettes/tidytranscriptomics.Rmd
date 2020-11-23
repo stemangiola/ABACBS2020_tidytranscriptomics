@@ -701,7 +701,7 @@ library(tidyseurat)
 This is a seurat object but it is evaluated as tibble. So it is fully compatible both with Seurat and tidyverse APIs. 
 
 ```{r}
-pbmc_small_tidy <- ABACBS2020tidytranscriptomics::pbmc_small %>% tidy()
+pbmc_small_tidy <- ABACBS2020tidytranscriptomics::pbmc_small_seurat %>% tidy()
 ```
 
 **It looks like a tibble**
@@ -849,7 +849,7 @@ cell_type_df <-
 pbmc_small_cell_type <-
   pbmc_small_cluster %>%
   left_join(
-  	ABACBS2020tidytranscriptomics::cell_type_df, 
+  	ABACBS2020tidytranscriptomics::cell_type_df_seurat, 
   	by = "seurat_clusters"
   )
 
@@ -923,7 +923,7 @@ library(tidySingleCellExperiment)
 This is a SingleCellExperiment object but it is evaluated as tibble. So it is fully compatible both with SingleCellExperiment and tidyverse APIs. 
 
 ```{r}
-pbmc_small_tidy <- biocasia2020tidytranscriptomics::pbmc_small %>% tidy()
+pbmc_small_tidy <- ABACBS2020tidytranscriptomics::pbmc_small_sce %>% tidy()
 ```
 
 **It looks like a tibble**
@@ -1148,7 +1148,7 @@ cell_type_df <-
 We have pre-calculated the cluster classification.
 
 ```{r}
-cell_type_df <- biocasia2020tidytranscriptomics::cell_type_df
+cell_type_df <- ABACBS2020tidytranscriptomics::cell_type_df_sce
 cell_type_df
 ```
 
