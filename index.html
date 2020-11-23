@@ -98,7 +98,7 @@
 <h2 class="hasAnchor">
 <a href="#syllabus" class="anchor"></a>Syllabus</h2>
 <p>Material <a href="https://stemangiola.github.io/ABACBS2020_tidytranscriptomics/articles/tidytranscriptomics.html">web page</a>.</p>
-<p>This material was created for the R/Pharma2020 conference workshop but it can also be used for self-learning.</p>
+<p>This material was created for the <a href="https://www.abacbs.org/workshops">ABACBS 2020 conference workshop</a> but it can also be used for self-learning.</p>
 <p>More details on the workshop are below.</p>
 </div>
 <div id="workshop-package-installation" class="section level2">
@@ -134,20 +134,21 @@ browseVignettes("ABACBS2020tidytranscriptomics")</a></code></pre>
 <h2 class="hasAnchor">
 <a href="#workshop-description" class="anchor"></a>Workshop Description</h2>
 <p>This workshop will present how to perform analysis of RNA sequencing data following the tidy data paradigm. The tidy data paradigm provides a standard way to organise data values within a dataset, where each variable is a column, each observation is a row, and data is manipulated using an easy-to-understand vocabulary. Most importantly, the data structure remains consistent across manipulation and analysis functions.</p>
-<p>This can be achieved for RNA sequencing data with the <a href="https://stemangiola.github.io/tidybulk/">tidybulk</a>, <a href="https://stemangiola.github.io/tidyseurat/">tidyseurat</a>, <a href="https://stemangiola.github.io/tidyHeatmap/">tidyHeatmap</a> and <a href="https://www.tidyverse.org/">tidyverse</a> packages. The tidybulk package provides a tidy data structure and a modular framework for bulk transcriptional analyses, the tidyseurat package provides similar for single-cell transcriptional analyses, and tidyHeatmap provides a tidy implementation of ComplexHeatmap. These packages are part of the tidytranscriptomics suite that introduces a tidy approach to RNA sequencing data.</p>
+<p>This can be achieved for RNA sequencing data with the <a href="https://stemangiola.github.io/tidybulk/">tidybulk</a>, <a href="https://stemangiola.github.io/tidyseurat/">tidyseurat</a>, <a href="https://stemangiola.github.io/tidySingleCellExperiment/">tidySingleCellExperiment</a>, <a href="https://stemangiola.github.io/tidyHeatmap/">tidyHeatmap</a> and <a href="https://www.tidyverse.org/">tidyverse</a> packages. The tidybulk package provides a tidy data structure and a modular framework for bulk transcriptional analyses, the tidyseurat and tidySingleCellEperiment packages provide similar for single-cell, and tidyHeatmap provides a tidy implementation of ComplexHeatmap. These packages are part of the tidytranscriptomics suite that introduces a tidy approach to RNA sequencing data.</p>
 <div id="pre-requisites" class="section level3">
 <h3 class="hasAnchor">
 <a href="#pre-requisites" class="anchor"></a>Pre-requisites</h3>
 <ul>
 <li>Basic knowledge of RStudio</li>
-<li>Familiarity with tidyverse syntax</li>
+<li>Some familiarity with tidyverse syntax</li>
+<li>Some familiarity with bulk RNA-seq and single cell RNA-seq</li>
 </ul>
 <p>Recommended Background Reading <a href="https://melbournebioinformatics.github.io/r-intro-biologists/intro_r_biologists.html">Introduction to R for Biologists</a></p>
 </div>
 <div id="workshop-participation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#workshop-participation" class="anchor"></a>Workshop Participation</h3>
-<p>The workshop format is a 3 hour session consisting of hands-on demos, exercises and Q&amp;A.</p>
+<p>The workshop format is a 3.5 hour session consisting of hands-on demos, exercises and Q&amp;A.</p>
 </div>
 <div id="r--bioconductor-packages-used" class="section level3">
 <h3 class="hasAnchor">
@@ -156,6 +157,7 @@ browseVignettes("ABACBS2020tidytranscriptomics")</a></code></pre>
 <li>tidyverse</li>
 <li>tidybulk</li>
 <li>tidyseurat</li>
+<li>tidySingleCellExperiment</li>
 <li>tidyHeatmap</li>
 <li>tidygate</li>
 <li>limma</li>
@@ -186,79 +188,51 @@ browseVignettes("ABACBS2020tidytranscriptomics")</a></code></pre>
 </tr>
 <tr class="even">
 <td><em>Hands-on Demos</em></td>
-<td>50m</td>
+<td>90m</td>
 </tr>
 <tr class="odd">
-<td>    Introduction to RNA-seq</td>
-<td></td>
-</tr>
-<tr class="even">
 <td>    Data preprocessing</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>    Data dimensionality reduction and clustering</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>    Differential gene expression</td>
 <td></td>
 </tr>
-<tr class="odd">
-<td>    Data visualisation</td>
-<td></td>
-</tr>
 <tr class="even">
-<td><em>Exercises and Q&amp;A</em></td>
-<td>10m</td>
-</tr>
-<tr class="odd">
-<td><em>Break</em></td>
-<td>5m</td>
-</tr>
-<tr class="even">
-<td><strong>Part 2 Bulk RNA-seq Extended</strong></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><em>Hands-on Demos</em></td>
-<td>40m</td>
-</tr>
-<tr class="even">
-<td>    Comparison of differential testing tools</td>
-<td></td>
-</tr>
-<tr class="odd">
 <td>    Cell type composition analysis</td>
 <td></td>
 </tr>
-<tr class="even">
-<td><em>Q&amp;A</em></td>
-<td>10m</td>
-</tr>
 <tr class="odd">
 <td><em>Break</em></td>
-<td>5m</td>
+<td>30m</td>
 </tr>
 <tr class="even">
-<td><strong>Part 3 Single-cell RNA-seq</strong></td>
+<td><strong>Part 2 Single-cell RNA-seq</strong></td>
 <td></td>
 </tr>
 <tr class="odd">
 <td><em>Hands-on Demos</em></td>
-<td>30m</td>
+<td>90m</td>
 </tr>
 <tr class="even">
-<td>    Introduction to single-cell</td>
+<td>    Introduction to tidyseurat</td>
 <td></td>
 </tr>
 <tr class="odd">
-<td><strong>Additional Q&amp;A</strong></td>
-<td>30m</td>
+<td>    Introduction to tidySingleCellExperiment</td>
+<td></td>
 </tr>
 <tr class="even">
+<td>    Pseudobulk analysis</td>
+<td></td>
+</tr>
+<tr class="odd">
 <td>Total</td>
-<td>180m</td>
+<td>220m</td>
 </tr>
 </tbody>
 </table>
@@ -273,7 +247,7 @@ browseVignettes("ABACBS2020tidytranscriptomics")</a></code></pre>
 <a href="#learning-goals" class="anchor"></a>Learning goals</h4>
 <ul>
 <li>To understand the key concepts and steps of RNA sequencing data analysis</li>
-<li>To approach data representation and analysis though a tidy data paradigm, integrating tidyverse with tidybulk, tidyseurat and tidyHeatmap.</li>
+<li>To approach data representation and analysis though a tidy data paradigm, integrating tidyverse with tidybulk, tidyseurat, tidySingleCellExperiment and tidyHeatmap.</li>
 </ul>
 </div>
 <div id="learning-objectives" class="section level4">
