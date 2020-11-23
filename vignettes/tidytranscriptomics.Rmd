@@ -743,7 +743,7 @@ pbmc_small_tidy_clean
 ## Preprocess the dataset
 
 
-```{r preprocess, warning=FALSE}
+```{r preprocess seurat, warning=FALSE}
 pbmc_small_scaled <-
   pbmc_small_tidy_clean %>%
   SCTransform(verbose = FALSE) %>%
@@ -756,7 +756,7 @@ pbmc_small_scaled
 
 Beside PCA which is a linear dimensionality reduction, we can apply neighbour aware methods such as UMAP, to better define locally similar cells. We can calculate the first 3 UMAP dimensions using the Seurat framework.
 
-```{r umap}
+```{r umap seurat}
 pbmc_small_UMAP <-
   pbmc_small_scaled %>%
   RunPCA(verbose = FALSE) %>%
@@ -765,7 +765,7 @@ pbmc_small_UMAP <-
 
 And we can plot them using 3D plot using plotly.
 
-```{r umap plot, eval=FALSE}
+```{r umap plot seurat, eval=FALSE}
 pbmc_small_UMAP %>%
   plot_ly(
     x = ~`UMAP_1`,
@@ -784,7 +784,7 @@ knitr::include_graphics("../inst/vignettes/plotly.png")
 
 We proceed with cluster identification with Seurat.
 
-```{r cluster}
+```{r cluster seurat}
 pbmc_small_cluster <-
   pbmc_small_UMAP %>%
   FindNeighbors(verbose = FALSE) %>%
@@ -795,7 +795,7 @@ pbmc_small_cluster
 
 Now we can interrogate the object as if it was a regular tibble data frame.
 
-```{r cluster count}
+```{r cluster count seurat}
 pbmc_small_cluster %>%
   count(sample, groups, seurat_clusters)
 ```
