@@ -114,7 +114,7 @@ Rough guide
 |      Single-cell analysis with tidyseurat               |      |
 |      Single-cell analysis with tidySingleCellExperiment |      |
 |      Pseudobulk analysis                                |      |
-| Total                                                   | 220m |
+| Total                                                   | 210m |
 
 ### Workshop goals and objectives
 
