@@ -47,3 +47,11 @@
 #' @format  A tibble containing two columns: label and first.labels
 #' @usage data(cell_type_df_sce)
 "cell_type_df_sce"
+
+#' de_gate_gates
+#'
+#' Stefano's gate list
+#'
+#' @format  A list of gates to use. Gates consist of x and y coordinates.
+#' @usage data(de_gate_gates)
+"de_gate_gates"

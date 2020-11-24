@@ -17,6 +17,16 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{css, echo = FALSE}
+# Formatting for polls
+.poll {
+background-color: #fff4d4;
+}
+.poll code {
+	background-color: #fff4d4;
+}
+```
+
 ```{r, echo=FALSE, out.width = "100px"}
 knitr::include_graphics("../inst/vignettes/tidybulk_logo.png")
 ```
@@ -32,6 +42,24 @@ A more detailed schedule can be found [here](https://stemangiola.github.io/ABACB
 **Interact**: Zoom chat and polls
 <br>
 <br>
+
+```{poll_1 class.source="poll"}
+Poll: Will you code along and/or try out exercises during this workshop?
+```
+
+
+```{poll_2 class.source="poll"}
+Poll: Do you have experience with transcriptomic analyses?
+```
+
+```{poll_3 class.source="poll"}
+Poll: Do you have experience with tidyverse?
+```
+
+```{poll_3 class.source="poll"}
+Poll: What are you more interested in learning in this workshop?
+```
+
 
 # What is transcriptomics?
 
