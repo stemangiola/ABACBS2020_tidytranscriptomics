@@ -40,6 +40,13 @@ data("airway")
 counts_tt <- 
     airway %>%
     tidybulk() %>%
+    mutate(sample=str_remove(sample, "SRR1039")) %>%
+	mutate(symbol = AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, 
+	                                      keys = as.character(feature), 
+	                                      keytype = "ENSEMBL", 
+	                                      column="SYMBOL", 
+	                                      multiVals = "first")) %>%
+    # filter 
     keep_abundant(factor_of_interest=dex)
 ```
 
