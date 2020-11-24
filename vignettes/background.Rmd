@@ -23,9 +23,8 @@ knitr::include_graphics("../inst/vignettes/tidybulk_logo.png")
 
 # Schedule
 
-- Part 1 Bulk RNA-seq Core
-- Part 2 Bulk RNA-seq Extended
-- Part 3 Single-cell RNA-seq
+- Part 1 Tidy Bulk RNA-seq analysis
+- Part 2 Tidy Single-cell RNA-seq analysis
 
 A more detailed schedule can be found [here](https://stemangiola.github.io/ABACBS2020_tidytranscriptomics/index.html#time-outline).  
 <br>
@@ -51,9 +50,6 @@ knitr::include_graphics("../inst/vignettes/transcriptomics.jpg")
 - Transcriptome (RNA) can measure changes in expression of thousands of coding and non-coding transcripts
 <br>
 <br>
-```{r, echo=FALSE, out.width = "600px"}
-knitr::include_graphics("../inst/vignettes/ScreenShot1.png")
-```
 
 # Possible experimental design
 
