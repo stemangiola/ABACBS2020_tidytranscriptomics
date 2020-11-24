@@ -5,7 +5,7 @@
 
 # Introduction to Tidy Transcriptomics
 <p float="left">
-<img height="100" alt="ABACBS2020" src="ABACBS_logo.png"/> 
+<img height="100" alt="ABACBS2020" src="man/figures/abacbs-glow-logo-200x200.png"/> 
 <img height="100" alt="tidybulk" src="https://github.com/Bioconductor/BiocStickers/blob/master/tidybulk/tidybulk.png?raw=true"/>
 </p>
 
@@ -101,21 +101,20 @@ The workshop format is a 3.5 hour session consisting of hands-on demos, exercise
 
 Rough guide
 
-| Activity                                              | Time |
-|-------------------------------------------------------|------|
-| **Part 1 Bulk RNA-seq Core**                          |      |
-|  *Hands-on Demos*                                     |  90m |
-|      Data preprocessing                               |      |
-|      Data dimensionality reduction and clustering     |      |
-|      Differential gene expression                     |      |
-|      Cell type composition analysis                   |      |
-| _Break_                                               |  30m |
-| **Part 2 Single-cell RNA-seq**                        |      |
-|  *Hands-on Demos*                                     |  90m |
-|      Introduction to tidyseurat                       |      |
-|      Introduction to tidySingleCellExperiment         |      |
-|      Pseudobulk analysis                              |      |
-| Total                                                 | 220m |
+| Activity                                                | Time |
+|---------------------------------------------------------|------|
+| **Part 1 Bulk RNA-seq Core**                            |      |
+|  *Hands-on Demos*                                       |  90m |
+|      Data dimensionality reduction and clustering       |      |
+|      Differential gene expression                       |      |
+|      Cell type composition analysis                     |      |
+| _Break_                                                 |  30m |
+| **Part 2 Single-cell RNA-seq**                          |      |
+|  *Hands-on Demos*                                       |  90m |
+|      Single-cell analysis with tidyseurat               |      |
+|      Single-cell analysis with tidySingleCellExperiment |      |
+|      Pseudobulk analysis                                |      |
+| Total                                                   | 210m |
 
 ### Workshop goals and objectives
 
