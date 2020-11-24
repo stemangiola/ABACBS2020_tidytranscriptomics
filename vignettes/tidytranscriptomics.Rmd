@@ -797,9 +797,8 @@ pbmc_annotated %>%
     theme_bw() +
     theme(axis.text.x = element_text(angle = 50, hjust = 1, vjust = 1))
 ```
-```{pool}
+```{poll_5 class.source="poll"}
 What is the ID of the cell with the highest mitochondrial relative content?
-
 ```
 
 ```{r}
@@ -936,7 +935,7 @@ We can infer cell type identities using *SingleR* [@aran2019reference] and manip
 ```{r eval=FALSE}
 blueprint <- BlueprintEncodeData()
 
-cell_type_df <-
+cell_type_df_seurat <-
 	
 # extracting counts from Seurat object
   pbmc_cluster@assays[["SCT"]]@counts %>%
@@ -971,6 +970,9 @@ We can easily summarise the results. For example, we can see how cell type class
 pbmc_cell_type %>% count(seurat_clusters, first.labels)
 ```
 
+```{poll_6 class.source="poll"}
+How many cells are classified differently by SingleR when analyses are done by custer (as above) or by cell (omitting the argument `clusters`). Tip: you can answer this question without creating any variable, using left_join.
+```
 
 ##  Nested analyses
 
@@ -1034,6 +1036,7 @@ bulk_scaled
 	custom_theme + 
 	theme(aspect.ratio=1)
 ```
+
 Differential gene transcript-abundance analyses
 
 ```{r}
