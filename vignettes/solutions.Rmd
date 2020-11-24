@@ -46,7 +46,7 @@ counts_tt <-
 ### What fraction of variance is explained by PC3?
 
 ```{r}
-counts_tt %>% 
+counts_scal_PCA %>% 
   scale_abundance() %>%
   reduce_dimensions(method="PCA", .dims=3)
 ```

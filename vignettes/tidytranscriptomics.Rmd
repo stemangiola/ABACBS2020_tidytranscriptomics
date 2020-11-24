@@ -443,12 +443,10 @@ We can select some of the transcripts for further analysis using the [*tidygate*
 With tidygate, we can interactively draw gates to select points we want using `gate`. We specify which columns we want to plot in the scatterplot, and how many gates we want to draw. We can also specify the opacity if we want to make it easier to see overlapping points.
 
 ```{r, eval=FALSE}
-library(tidygate)
-
 de_gate <- 
   de_all %>%
   
-  gate(
+  tidygate::gate(
     feature,
     edgerQLT_PValue, 
     deseq2_pvalue, 
@@ -469,7 +467,7 @@ That will add a column called gate, specifying which gate the points (transcript
 de_gate <- 
   de_all %>%
   
-  gate(
+  tidygate::gate(
     feature,
     edgerQLT_PValue, 
     deseq2_pvalue, gate_list = ABACBS2020tidytranscriptomics::de_gate_gates
