@@ -1314,7 +1314,7 @@ devtools::source_gist("ebce5a3f931b298611b56680d39c073c")
 
 bulk_scaled =
 	pbmc_cell_type %>%
-	aggregate_cells() %>%
+	aggregate_cells(sample) %>%
 	tidybulk::identify_abundant(sample, transcript, abundance_RNA, factor_of_interest = groups) %>%
 	tidybulk::scale_abundance(sample, transcript, abundance_RNA) 
 
@@ -1337,8 +1337,40 @@ variable_overall_genes =
 	custom_theme + 
 	theme(aspect.ratio=1)
 ```
+Differential gene transcript-abundance analyses
 
 ```{r}
+bulk_cell_type =
+	pbmc_cell_type %>%
+	aggregate_cells(c(sample, first.labels )) 
+
+# Scaling
+bulk_test = 
+
+  bulk_cell_type %>%
+  nest(data = -first.labels) %>%
+  
+  # Nested analyses
+  mutate(test = map(
+    data, 
+    ~ .x %>%
+      
+      tidybulk(sample, transcript, abundance_RNA) %>%
+      
+      # Scaling
+      tidybulk::identify_abundant(factor_of_interest = groups) %>%
+	    tidybulk::scale_abundance() %>%
+      
+      # Hypothesis test
+      tidybulk::test_differential_abundance(~ groups, action="only") %>%
+      slice_head(n=5)
+      
+  ))
+	
+
+bulk_test %>% 
+  select(-data) %>% 
+  unnest(test)
 
 
 ```
