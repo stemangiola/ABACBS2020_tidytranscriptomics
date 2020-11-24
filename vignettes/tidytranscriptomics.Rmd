@@ -488,9 +488,6 @@ We can now select the transcripts from our two gates i.e. more significant in ed
 
 ```{r}
 de_gate %>% 
-    
-  # Generate scaled counts for plotting     
-  scale_abundance() %>%
   
   # Filter for transcripts within the gates
   filter(gate > 0) %>% 
@@ -503,21 +500,21 @@ de_gate %>%
   )) %>%
   
   # Order the plots for the transcripts
-  mutate(feature = fct_reorder(feature, edgerQLT_PValue, min)) %>%
+  mutate(feature = forcats::fct_reorder(feature, edgerQLT_PValue, min)) %>%
   
   # Plot
-  ggplot(aes(condition, counts_scaled, color=gate)) +
+  ggplot(aes(dex, counts_scaled, color=gate)) +
   geom_point() +
   facet_wrap(~feature, scale="free_y") +
   custom_theme
 ```
 
-This enables us to see, for example, that DESeq2 produces a more conservative logFC statistic for the transcript `FBgn0052939` .
+This enables us to see, for example, that DESeq2 produces a more conservative logFC statistic for the gene `ENSG00000104725`.
 
 ```{r}
 de_gate %>%
   pivot_transcript %>%
-  filter(feature == "FBgn0052939")%>%
+  filter(feature == "ENSG00000104725")%>%
   select(edgerQLT_logFC, deseq2_log2FoldChange)
 ```
 
