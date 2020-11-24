@@ -211,7 +211,7 @@ counts_scaled %>%
 
 ### Which method detects the most differentially abundant transcripts, p value adjusted for multiple testing <  0.05 (FDR, adj.P.Val, padj)?
 
-```{r}
+```{r, eval=FALSE}
 # Set up data
 pasilla_de <- 
   ABACBS2020tidytranscriptomics::pasilla %>% 
@@ -229,14 +229,14 @@ de_all <-
   # edgeR QLT
   test_differential_abundance(
     ~ condition + type, 
-    method = "edger_quasi_likelihood",
+    method = "edgeR_quasi_likelihood",
     prefix = "edgerQLT_"
   )  %>%
   
   # edgeR LRT
   test_differential_abundance(
     ~ condition + type, 
-    method = "edger_likelihood_ratio",
+    method = "edgeR_likelihood_ratio",
     prefix = "edgerLR_"
   )  %>%
   
@@ -255,7 +255,7 @@ de_all <-
   ) 
 ```
 
-```{r out.width = "70%"}
+```{r out.width = "70%", eval=FALSE}
 de_all %>%
 	
 	# Subset transcript information

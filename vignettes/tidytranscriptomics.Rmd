@@ -797,7 +797,10 @@ pbmc_annotated %>%
     theme_bw() +
     theme(axis.text.x = element_text(angle = 50, hjust = 1, vjust = 1))
 ```
+```{pool}
+What is the ID of the cell with the highest mitochondrial relative content?
 
+```
 
 ```{r}
 pbmc_alive = pbmc_annotated %>% filter(!high_mitochondrion)
