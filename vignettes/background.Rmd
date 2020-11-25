@@ -128,7 +128,7 @@ knitr::include_graphics("../inst/vignettes/single_cell_RNAseq_pipeline.png")
 
 ## Cloud
 
-Easiest way to run this material. Only available during workshop. Thanks to Nectar and ARDC for supplying the resources and helping to set up.
+Easiest way to run this material. Only available during workshop. Thanks to ARDC for providing RStudio in the Nectar Research Cloud and Andy Botting from ARDC for helping to set up.
 
  * Login to https://rstudio.tidytranscriptomics-workshop.cloud.edu.au/rstudio/auth-sign-in with one of the supplied usernames and passwords
  * Open `tidytranscriptomics.Rmd` in `vignettes` folder
