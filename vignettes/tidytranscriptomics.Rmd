@@ -980,7 +980,7 @@ pbmc_UMAP %>%
 
 
 ```{r, echo=FALSE}
-knitr::include_graphics("../inst/vignettes/plotly.png")
+knitr::include_graphics("../inst/vignettes/plotly_1.png")
 ```
 
 ### Identify clusters 
@@ -1014,6 +1014,10 @@ pbmc_cluster %>%
     colors = friendly_cols[1:10], 
     color = ~ seurat_clusters
   )
+```
+
+```{r, echo=FALSE}
+knitr::include_graphics("../inst/vignettes/plotly_2.png")
 ```
 
 ### Manual cell type classification
