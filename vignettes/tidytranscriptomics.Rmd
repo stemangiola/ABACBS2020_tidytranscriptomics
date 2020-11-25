@@ -795,7 +795,7 @@ library(tidyseurat)
 ```
 
 
-The single-cell RNA sequencing data used here is 3000 cells in total, subsetted from 20 samples from 10 peripheral blood mononuclear cell (pbmc) datasets. The datasets include GSE115189 [@Freytag2018], SRR11038995 [@Cai2020, SCP345 (singlecell.broadinstitute.org), SCP424 [@Ding2020], SCP591 [@Karagiannis2020] and 10x-derived 6K and 8K datasets (support.10xgenomics.com/). 
+The single-cell RNA sequencing data used here is 3000 cells in total, subsetted from 20 samples from 10 peripheral blood mononuclear cell (pbmc) datasets. The datasets are from GSE115189/SRR7244582 [@Freytag2018], SRR11038995 [@Cai2020, SCP345 (singlecell.broadinstitute.org), SCP424 [@Ding2020], SCP591 [@Karagiannis2020] and 10x-derived 6K and 8K datasets (support.10xgenomics.com/). 
 
 ```{r}
 pbmc <- ABACBS2020tidytranscriptomics::pbmc
@@ -803,7 +803,7 @@ pbmc <- ABACBS2020tidytranscriptomics::pbmc
 dim(pbmc)
 ```
 
-## Create `tidyseurat`
+### Create `tidyseurat`
 
 This is a seurat object but it is evaluated as tibble. So it is fully compatible both with Seurat and tidyverse APIs.
 
@@ -823,7 +823,7 @@ pbmc_tidy
 Assays(pbmc_tidy)
 ```
 
-## Polish the data
+### Polish the data
 
 We can interact with our object as we do with any tibble. In this case we want to polish an annotation column. We will extract the sample and dataset names from the file name column into separate columns.
 
@@ -840,7 +840,7 @@ pbmc_tidy_clean <-
 pbmc_tidy_clean
 ```
 
-## Quality control
+### Quality control
 
 A key quality control step performed in single cell analysis is assessment of the proportion of mitochondrial transcripts. A high mitochondrial count can indicate the cell is dead or dying and is thus poor quality.
 
@@ -913,7 +913,7 @@ We filter out cells with high mitochondrial content.
 pbmc_alive = pbmc_annotated %>% filter(!high_mitochondrion)
 ```
 
-## Scaling and Integrating
+### Scaling and Integrating
 
 ```{r preprocess seurat, message=FALSE, warning=FALSE}
 
@@ -950,7 +950,7 @@ pbmc_integrated <-
 
 ```
 
-## Reduce dimensions
+### Reduce dimensions
 
 Besides PCA which is a linear dimensionality reduction, we can apply neighbour aware methods such as UMAP, to better define locally similar cells. We can calculate the first 3 UMAP dimensions using the Seurat framework.
 
@@ -980,7 +980,7 @@ pbmc_UMAP %>%
 knitr::include_graphics("../inst/vignettes/plotly.png")
 ```
 
-## Identify clusters 
+### Identify clusters 
 
 We proceed with cluster identification with Seurat.
 
@@ -1013,7 +1013,7 @@ pbmc_cluster %>%
   )
 ```
 
-## Manual cell type classification
+### Manual cell type classification
 
 We can identify cluster markers (genes) using Seurat.
 
@@ -1035,7 +1035,7 @@ pbmc_cluster %>%
   )
 ```
 
-## Automatic cell type classification
+### Automatic cell type classification
 
 We can infer cell type identities using *SingleR* [@aran2019reference] and manipulate the output using tidyverse. SingleR [accepts any log-normalised transcript abundance matrix](https://bioconductor.org/packages/devel/bioc/vignettes/SingleR/inst/doc/SingleR.html)
 
@@ -1081,7 +1081,7 @@ pbmc_cell_type %>% count(seurat_clusters, first.labels)
 How many cells are classified differently by SingleR when analyses are done by custer (as above) or by cell (omitting the argument `clusters`). Tip: you can answer this question without creating any variable, using left_join.
 ```
 
-##  Nested analyses
+### Nested analyses
 
 A powerful tool we can use with tidyseurat is `nest`. We can easily perform independent analyses on subsets of the dataset. First we classify cell types in lymphoid and myeloid; then, nest based on the new classification
 
@@ -1182,7 +1182,7 @@ bulk_test %>%
 
 ```
 
-## tidySingleCellExperiment
+## tidySingleCellExperiment single-cell analysis
 
 As an alternative to Seurat, Bioconductor's SingleCellExperiment is a very popular container for single cell RNA sequencing data [@sce]. tidySingleCellExperiment provides a bridge between the SingleCellExperiment single-cell package [@sce] and the tidyverse [@wickham2019welcome]. It enables the display of the
 SingleCellExperiment object as a tidyverse tibble, and provides SingleCellExperiment-compatible *dplyr*, *tidyr*, *ggplot* and *plotly* functions. Below we show how to perform similar steps to what we already did with Seurat, but this time using tidySingleCellExperiment.
@@ -1204,7 +1204,7 @@ library(tidySingleCellExperiment)
 ```
 
 
-## Create `tidySingleCellExperiment`
+### Create `tidySingleCellExperiment`
 
 This is a SingleCellExperiment object but it is evaluated as tibble. So it is fully compatible both with SingleCellExperiment and tidyverse APIs. 
 
@@ -1224,7 +1224,7 @@ pbmc_small_tidy
 assayNames(pbmc_small_tidy) # from SummarizedExperiment
 ```
 
-## Polish the data
+### Polish the data
 
 We can interact with our object as we do with any tibble. In this case we want to polish an annotation column.
 
@@ -1241,7 +1241,7 @@ pbmc_small_polished <-
 pbmc_small_polished
 ```
 
-## Calculate the log of the scaled counts
+### Calculate the log of the scaled counts
 
 We can treat `pbmc_small_polished` as a [*SingleCellExperiment* object](https://www.bioconductor.org/packages/release/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html)
 
@@ -1253,7 +1253,7 @@ logcounts(pbmc_small_polished) <- log2(t(t(counts)/size.factors) + 1)  # from Si
 assayNames(pbmc_small_polished)                                        # from SummarizedExperiment
 ```
 
-## Exploratory analyses
+### Exploratory analyses
 
 Here we plot abundance of two transcripts for each group.
 
@@ -1280,9 +1280,9 @@ pbmc_small_polished_abundance %>%
   custom_theme
 ```
 
-## Reduce dimensions
+### Reduce dimensions
 
-### PCA
+#### PCA
 
 We proceed with data processing with Bioconductor packages, such as *scran* [@lun2016pooling] and *scater* [@mccarthy2017scater].
 
@@ -1312,7 +1312,7 @@ pbmc_small_pca %>%
 ```
 
 
-### UMAP
+#### UMAP
 
 Beside PCA which is a linear dimensionality reduction, we can apply neighbour aware methods such as UMAP, to better define locally similar cells. We can calculate the first 3 UMAP dimensions using the scater framework.
 
@@ -1324,7 +1324,7 @@ pbmc_small_UMAP <-
 pbmc_small_UMAP
 ```
 
-## Identify clusters 
+### Identify clusters 
 
 We can proceed with cluster identification with *scran*.
 
@@ -1367,7 +1367,6 @@ pbmc_small_cluster %>%
 ```{r, echo=FALSE}
 knitr::include_graphics("../inst/vignettes/plotly.png")
 ```
-
 
 
 ## Key Points
