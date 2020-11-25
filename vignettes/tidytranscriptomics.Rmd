@@ -1305,21 +1305,12 @@ pbmc_small_cluster <- pbmc_small_UMAP
 
 # Assign clusters to the 'colLabels'
 # of the SingleCellExperiment object
-<<<<<<< HEAD
-colLabels(pbmc_small_cluster) <-                                          # from SingleCellExperiment
-    pbmc_small_pca %>%
-    buildSNNGraph(use.dimred="PCA") %>%                                   # from scran - shared nearest neighbour
-    cluster_walktrap() %$%                                                # from igraph
-    membership %>%
-    as.factor()
-=======
 colLabels(pbmc_small_cluster) <- # from SingleCellExperiment
   pbmc_small_pca %>%
-  buildSNNGraph(use.dimred = "PCA") %>% # from scran - shared nearest neighbor
+  buildSNNGraph(use.dimred = "PCA") %>% # from scran - shared nearest neighbour
   cluster_walktrap() %$% # from igraph
   membership %>%
   as.factor()
->>>>>>> c8d78cc6579811d0390a75783c37ac79def1d3f2
 
 # Reorder columns
 pbmc_small_cluster %>% select(label, everything())
