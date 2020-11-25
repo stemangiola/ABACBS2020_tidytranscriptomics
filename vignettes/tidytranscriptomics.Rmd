@@ -842,7 +842,7 @@ pbmc_tidy_clean
 
 ### Quality control
 
-A key quality control step performed in single cell analysis is assessment of the proportion of mitochondrial transcripts. A high mitochondrial count can indicate the cell is dead or dying and is thus poor quality.
+A key quality control step performed in single cell analysis is assessment of the proportion of mitochondrial transcripts. A high mitochondrial count can indicate the cell is dead or dying and is thus poor quality. A powerful tool we can use with tidyseurat is tidyverse `nest`. We can easily perform independent analyses on subsets of the data, for example, we can nest by dataset to analyse the mitochondrial content.
 
 ```{r}
 
@@ -957,12 +957,12 @@ Besides PCA which is a linear dimensionality reduction, we can apply neighbour a
 ```{r umap seurat}
 pbmc_UMAP <-
   pbmc_integrated %>%
-  FindVariableFeatures(verbose = FALSE) %>%
+  #FindVariableFeatures(verbose = FALSE) %>%
   RunPCA(verbose = FALSE) %>%
   RunUMAP(reduction = "pca", dims = 1:15, n.components = 3L)
 ```
 
-And we can plot the output as a 3D plot using plotly.
+And we can plot the output as a 3D plot using plotly. With this we can check if the datasets are clustering independently, indicating a batch effect, or if they are mixed together and cells are clustering by cell type.
 
 ```{r umap plot seurat, eval=FALSE}
 pbmc_UMAP %>%
@@ -1000,7 +1000,7 @@ pbmc_cluster %>%
   count(dataset, groups, seurat_clusters)
 ```
 
-And we can plot the clusters as a 3D plot using plotly.
+And we can plot the clusters as a 3D plot using plotly. This time we are colouring by estimated cluster labels to visually check the cluster labels.
 
 ```{r umap plot 2, eval=FALSE}
 pbmc_cluster %>%
@@ -1037,7 +1037,7 @@ pbmc_cluster %>%
 
 ### Automatic cell type classification
 
-We can infer cell type identities using *SingleR* [@aran2019reference] and manipulate the output using tidyverse. SingleR [accepts any log-normalised transcript abundance matrix](https://bioconductor.org/packages/devel/bioc/vignettes/SingleR/inst/doc/SingleR.html)
+We can infer cell type identities (e.g. T cell) using *SingleR* [@aran2019reference] and manipulate the output using tidyverse. SingleR [accepts any log-normalised transcript abundance matrix](https://bioconductor.org/packages/devel/bioc/vignettes/SingleR/inst/doc/SingleR.html)
 
 ```{r eval=FALSE}
 blueprint <- BlueprintEncodeData()
@@ -1062,7 +1062,7 @@ cell_type_df_seurat <-
 ```
 
 ```{r}
-# Join UMAP and cell type info
+# Join cell type info
 pbmc_cell_type <-
   pbmc_cluster %>%
   left_join(cell_type_df_seurat, by = "seurat_clusters")
@@ -1081,35 +1081,6 @@ pbmc_cell_type %>% count(seurat_clusters, first.labels)
 How many cells are classified differently by SingleR when analyses are done by custer (as above) or by cell (omitting the argument `clusters`). Tip: you can answer this question without creating any variable, using left_join.
 ```
 
-### Nested analyses
-
-A powerful tool we can use with tidyseurat is `nest`. We can easily perform independent analyses on subsets of the dataset. First we classify cell types in lymphoid and myeloid; then, nest based on the new classification
-
-```{r}
-pbmc_nested <-
-  pbmc_cell_type %>%
-  filter(first.labels != "Platelets") %>%
-  mutate(cell_class = if_else(`first.labels` %in% c("Macrophage", "Monocyte"), "myeloid", "lymphoid")) %>%
-  nest(data = -cell_class)
-
-pbmc_nested
-```
-
-Now we can independently for the lymphoid and myeloid subsets (i) find variable features, (ii) reduce dimensions, and (iii) cluster using both tidyverse and Seurat seamlessly.
-
-```{r, warning=FALSE}
-pbmc_nested_reanalysed <-
-  pbmc_nested %>%
-  mutate(data = map(
-    data, ~ .x %>%
-      FindVariableFeatures(verbose = FALSE) %>%
-      RunPCA(npcs = 10, verbose = FALSE) %>%
-      FindNeighbors(verbose = FALSE) %>%
-      FindClusters(method = "igraph", verbose = FALSE) 
-  ))
-
-pbmc_nested_reanalysed
-```
 
 ## Pseudobulk analyses
 
