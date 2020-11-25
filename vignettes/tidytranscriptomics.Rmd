@@ -565,7 +565,7 @@ With tidybulk, we can easily infer the proportions of cell types within a tissue
 ```{r}
 BRCA_cell_type <- 
 	BRCA_tidy %>%
-	deconvolve_cellularity(action="get")
+	deconvolve_cellularity(action="get", cores = 1)
 
 BRCA_cell_type
 ```
@@ -633,7 +633,7 @@ library(survival)
 
 BRCA_tidy_survival <- 
 	BRCA_tidy %>%
-	test_differential_cellularity(Surv(time, event_occurred) ~ .	) %>%
+	test_differential_cellularity(Surv(time, event_occurred) ~ .	, cores = 1) %>%
 	arrange(p.value)
 
 BRCA_tidy_survival %>%

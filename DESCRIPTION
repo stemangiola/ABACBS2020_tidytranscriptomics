@@ -56,7 +56,10 @@ Imports:
     broom,
     scuttle,
     EnsDb.Hsapiens.v86,
-    celldex
+    celldex,
+    devtools,
+    rlang,
+    magrittr
 Suggests:
     knitr,
     rmarkdown,
