@@ -1076,7 +1076,7 @@ pbmc_cell_type %>% count(seurat_clusters, first.labels)
 ```
 
 ```{poll_6 class.source="poll"}
-How many cells are classified differently by SingleR when analyses are done by custer (as above) or by cell (omitting the argument `clusters`). Tip: you can answer this question without creating any variable, using left_join.
+How many cells are classified differently by SingleR when analyses are done by cluster (as above) or by cell (omitting the argument `clusters`). Tip: you can answer this question without creating any variable, using left_join.
 ```
 
 
