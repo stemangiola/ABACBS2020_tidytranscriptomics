@@ -48,18 +48,6 @@ Some of the material in Part 1 was adapted from an R for RNA sequencing workshop
 knitr::include_graphics("../inst/vignettes/tidybulk_logo.png")
 ```
 
-```{poll_1 class.source="poll"}
-Poll: Will you code along and/or try out exercises during this workshop?
-```
-
-
-```{poll_2 class.source="poll"}
-Poll: Do you have experience with transcriptomic analyses?
-```
-
-```{poll_3 class.source="poll"}
-Poll: Do you have experience with tidyverse?
-```
 
 ## Introduction
 Measuring gene expression on a genome-wide scale has become common practice over the last two decades or so, with microarrays predominantly used pre-2008. With the advent of next generation sequencing technology in 2008, an increasing number of scientists use this technology to measure and understand changes in gene expression in often complex systems. As sequencing costs have decreased, using RNA sequencing to simultaneously measure the expression of tens of thousands of genes for multiple samples has never been easier. The cost of these experiments has now moved from generating the data to storing and analysing it.
@@ -409,6 +397,8 @@ de_all
 
 This outputs the columns from each method such as log-fold change (logFC), false-discovery rate (FDR) and probability value (p-value). logFC is log2(treated/untreated).
 
+### Comparison of methods
+
 We can visually compare the significance for all methods. We will notice that there is some difference between the methods.
 
 ```{r message=FALSE}
@@ -418,14 +408,119 @@ de_all %>%
   ggpairs(1:4)
 ```
 
-_Note: You may notice that the methods produce columns with different names for similar outputs. If you wish to make these consistent you can do that with tidyverse `rename`. For example, to rename the p value adjusted columns you could run below._
+In order to decide which genes are differentially expressed, we usually take a cut-off of 0.05 on the FDR (or adjusted P value), NOT the raw p-value. This is because we are testing many genes (multiple testing), and the chances of finding differentially expressed genes is very high when you do that many tests. Hence we need to control the false discovery rate, which is the adjusted p-value column in the results table. What this means is that if 100 genes are significant at a 5% false discovery rate, we are willing to accept that 5 will be false positives. 
+
+We can count how many differentially expressed genes there are, for example with the edgeR QLT method. We'll filter on FDR 0.05.
+
+```{r}
+de_all %>%
+  filter(edgerQLT_FDR < 0.05) %>%
+  summarise(num_de = n_distinct(feature))
+```
+
+
+```{poll_7 class.source="poll"}
+Which method detects the most differentially abundant transcripts, p value adjusted for multiple testing <  0.05 (FDR, adj.P.Val, padj)?
+```
+
+_Note: Some of the methods produce columns with different names for similar outputs. If you wish to make these consistent you can do that with tidyverse `rename`. For example, to rename the p value adjusted columns you could run below._
 
 ```{r eval=FALSE}
 de_all %>% rename(deseq2_FDR = deseq2_padj, voom_FDR = voom_adj.P.Val)
 ```
 
+We can visually compare the significance for all methods. 
 
-Or if we just wanted to run one method we could do that. The default method is edgeR quasi-likelihood.
+```{r}
+de_all %>%
+  pivot_transcript() %>%
+  select(edgerQLT_PValue, edgerLR_PValue, voom_P.Value, deseq2_pvalue, feature) %>%
+  ggpairs(1:4)
+```
+
+We can select some of the transcripts for further analysis using the [*tidygate*](https://github.com/stemangiola/tidygate) package.
+
+With tidygate, we can interactively draw gates to select points we want using `gate`. We specify which columns we want to plot in the scatterplot, and how many gates we want to draw. We can also specify the opacity if we want to make it easier to see overlapping points.
+
+```{r, eval=FALSE}
+de_gate <- 
+  de_all %>%
+  
+  tidygate::gate(
+    feature,
+    edgerQLT_PValue, 
+    deseq2_pvalue, 
+    opacity=0.3, 
+    how_many_gates = 2 
+  )
+```
+
+We then click to draw gates around the points we want, for example as shown in the screenshot below.
+
+```{r, echo=FALSE}
+knitr::include_graphics("../inst/vignettes/comparison_different_DE_methods_gates.png")
+```
+That will add a column called gate, specifying which gate the points (transcripts) are in.
+
+```{r echo=FALSE}
+# using pre-selected gates just to render the html version of this document
+de_gate <- 
+  de_all %>%
+  
+  tidygate::gate(
+    feature,
+    edgerQLT_PValue, 
+    deseq2_pvalue, gate_list = ABACBS2020tidytranscriptomics::de_gate_gates
+  )
+
+de_gate
+```
+
+We can check how many transcripts we've got in each gate.
+
+```{r}
+de_gate %>% 
+    pivot_transcript() %>% 
+    count(gate)
+```
+
+We can now select the transcripts from our two gates i.e. more significant in edgeR (gate 1) and more significant in DESeq2 (gate 2).
+
+```{r}
+de_gate %>% 
+  
+  # Filter for transcripts within the gates
+  filter(gate > 0) %>% 
+  
+  # Rename for clarity
+  mutate(gate = case_when(
+    gate == 1 ~ "more in edgeR",
+    gate == 2 ~ "more in DESeq2",
+    TRUE ~ gate
+  )) %>%
+  
+  # Order the plots for the transcripts
+  mutate(feature = forcats::fct_reorder(feature, edgerQLT_PValue, min)) %>%
+  
+  # Plot
+  ggplot(aes(dex, counts_scaled, color=gate)) +
+  geom_point() +
+  facet_wrap(~feature, scale="free_y") +
+  custom_theme
+```
+
+This enables us to see, for example, that DESeq2 produces a more conservative logFC statistic for the gene `ENSG00000104725`.
+
+```{r}
+de_gate %>%
+  pivot_transcript %>%
+  filter(feature == "ENSG00000104725")%>%
+  select(edgerQLT_logFC, deseq2_log2FoldChange)
+```
+
+### Single method
+
+If we just wanted to run one differential testing method we could do that. The default method is edgeR quasi-likelihood.
 
 ```{r}
 counts_de <- counts_scal_PCA %>%
@@ -673,13 +768,13 @@ Some things we don't have time to cover in Part 1 of this workshop can be found 
 
 # Part 2 Single-cell RNA-seq
 
-[Background information] (https://stemangiola.github.io/ABACBS2020_tidytranscriptomics/articles/background.html#differences-between-bulk-and-single-cell-rna-sequencing-1)
+[Background information](https://stemangiola.github.io/ABACBS2020_tidytranscriptomics/articles/background.html#differences-between-bulk-and-single-cell-rna-sequencing-1)
 
 In Part 1 we showed how we can study the cell-type composition of a biological sample using bulk RNA sequencing.  Single cell sequencing enables a more direct estimation of cell-type composition and gives greater resolution. For bulk RNA sequencing we need to infer the cell types using the abundance of transcripts in the whole sample, with single-cell RNA sequencing we can directly measure the transcripts in each cell and then classify the cells into cell types. 
 
 ## tidyseurat
 
-Seurat is a very popular analysis toolkit for single cell RNA sequencing data [@butler2018integrating; @stuart2019comprehensive]. tidyseurat provides a bridge between the Seurat single-cell package [@butler2018integrating; @stuart2019comprehensive] and the tidyverse [@wickham2019welcome]. It creates an invisible layer that enables viewing the
+Seurat is a very popular analysis toolkit for single cell RNA sequencing data [@butler2018integrating; @stuart2019comprehensive]. tidyseurat provides a bridge between the Seurat single-cell package and the tidyverse. It creates an invisible layer that enables viewing the
 Seurat object as a tidyverse tibble, and provides Seurat-compatible *dplyr*, *tidyr*, *ggplot* and *plotly* functions.
 
 
@@ -700,16 +795,20 @@ library(tidyseurat)
 ```
 
 
-## Create `tidyseurat`
-
-This is a seurat object but it is evaluated as tibble. So it is fully compatible both with Seurat and tidyverse APIs. 
+The single-cell RNA sequencing data used here is 3000 cells in total, subsetted from 20 samples from 10 peripheral blood mononuclear cell (pbmc) datasets. The datasets are from GSE115189/SRR7244582 [@Freytag2018], SRR11038995 [@Cai2020, SCP345 (singlecell.broadinstitute.org), SCP424 [@Ding2020], SCP591 [@Karagiannis2020] and 10x-derived 6K and 8K datasets (support.10xgenomics.com/). 
 
 ```{r}
-ABACBS2020tidytranscriptomics::pbmc
+pbmc <- ABACBS2020tidytranscriptomics::pbmc
+
+dim(pbmc)
 ```
 
+### Create `tidyseurat`
+
+This is a seurat object but it is evaluated as tibble. So it is fully compatible both with Seurat and tidyverse APIs.
+
 ```{r}
-pbmc_tidy <- ABACBS2020tidytranscriptomics::pbmc %>% tidy()
+pbmc_tidy <- pbmc %>% tidy()
 ```
 
 **It looks like a tibble**
@@ -724,9 +823,9 @@ pbmc_tidy
 Assays(pbmc_tidy)
 ```
 
-## Polish the data
+### Polish the data
 
-We can interact with our object as we do with any tibble. In this case we want to polish an annotation column.
+We can interact with our object as we do with any tibble. In this case we want to polish an annotation column. We will extract the sample and dataset names from the file name column into separate columns.
 
 ```{r}
 pbmc_tidy_clean <-
@@ -741,7 +840,9 @@ pbmc_tidy_clean <-
 pbmc_tidy_clean
 ```
 
-## Quality control
+### Quality control
+
+A key quality control step performed in single cell analysis is assessment of the proportion of mitochondrial transcripts. A high mitochondrial count can indicate the cell is dead or dying and is thus poor quality.
 
 ```{r}
 
@@ -779,15 +880,20 @@ pbmc_annotated =
   
 ```
 
+We can use tidyverse to easily reshape the data and create beeswarm plots to visualise the mitochondrial content.
 
 ```{r}
 pbmc_annotated %>%
-    pivot_longer(c(detected , sum, subsets_Mito_percent)) %>%
+    
+    # Reshaping
+    pivot_longer(c(detected, sum, subsets_Mito_percent)) %>%
     ggplot(aes(x=dataset,y=value,
                          color = high_mitochondrion, 
                          alpha=high_mitochondrion,
                          size= high_mitochondrion
     )) +
+    
+    # Plotting
     ggbeeswarm::geom_quasirandom() +
     facet_wrap(~name, scale="free_y") +
     
@@ -801,14 +907,15 @@ pbmc_annotated %>%
 What is the ID of the cell with the highest mitochondrial relative content?
 ```
 
+We filter out cells with high mitochondrial content.
+
 ```{r}
 pbmc_alive = pbmc_annotated %>% filter(!high_mitochondrion)
-  
 ```
 
-## Scaling and Integrating
+### Scaling and Integrating
 
-```{r preprocess seurat, message=FALSE}
+```{r preprocess seurat, message=FALSE, warning=FALSE}
 
 pbmc_scaled_nested = 
   pbmc_alive %>%
@@ -825,7 +932,7 @@ integration_features <- SelectIntegrationFeatures(pbmc_scaled_nested$data, nfeat
 
 pbmc_integrated <- 
   
-  # reparation
+  # preparation
   PrepSCTIntegration(pbmc_scaled_nested$data, anchor.features = integration_features) %>%
   
   # Anchors identification
@@ -843,9 +950,9 @@ pbmc_integrated <-
 
 ```
 
-## Reduce dimensions
+### Reduce dimensions
 
-Beside PCA which is a linear dimensionality reduction, we can apply neighbour aware methods such as UMAP, to better define locally similar cells. We can calculate the first 3 UMAP dimensions using the Seurat framework.
+Besides PCA which is a linear dimensionality reduction, we can apply neighbour aware methods such as UMAP, to better define locally similar cells. We can calculate the first 3 UMAP dimensions using the Seurat framework.
 
 ```{r umap seurat}
 pbmc_UMAP <-
@@ -855,7 +962,7 @@ pbmc_UMAP <-
   RunUMAP(reduction = "pca", dims = 1:15, n.components = 3L)
 ```
 
-And we can plot them using 3D plot using plotly.
+And we can plot the output as a 3D plot using plotly.
 
 ```{r umap plot seurat, eval=FALSE}
 pbmc_UMAP %>%
@@ -873,7 +980,7 @@ pbmc_UMAP %>%
 knitr::include_graphics("../inst/vignettes/plotly.png")
 ```
 
-## Identify clusters 
+### Identify clusters 
 
 We proceed with cluster identification with Seurat.
 
@@ -893,7 +1000,7 @@ pbmc_cluster %>%
   count(dataset, groups, seurat_clusters)
 ```
 
-And we can plot them using 3D plot using plotly.
+And we can plot the clusters as a 3D plot using plotly.
 
 ```{r umap plot 2, eval=FALSE}
 pbmc_cluster %>%
@@ -906,9 +1013,9 @@ pbmc_cluster %>%
   )
 ```
 
-## Manual cell type classification
+### Manual cell type classification
 
-We can identify cluster markers using Seurat.
+We can identify cluster markers (genes) using Seurat.
 
 ```{r}
 # Identify top 10 markers per cluster
@@ -928,7 +1035,7 @@ pbmc_cluster %>%
   )
 ```
 
-## Automatic cell type classification
+### Automatic cell type classification
 
 We can infer cell type identities using *SingleR* [@aran2019reference] and manipulate the output using tidyverse. SingleR [accepts any log-normalised transcript abundance matrix](https://bioconductor.org/packages/devel/bioc/vignettes/SingleR/inst/doc/SingleR.html)
 
@@ -974,7 +1081,7 @@ pbmc_cell_type %>% count(seurat_clusters, first.labels)
 How many cells are classified differently by SingleR when analyses are done by custer (as above) or by cell (omitting the argument `clusters`). Tip: you can answer this question without creating any variable, using left_join.
 ```
 
-##  Nested analyses
+### Nested analyses
 
 A powerful tool we can use with tidyseurat is `nest`. We can easily perform independent analyses on subsets of the dataset. First we classify cell types in lymphoid and myeloid; then, nest based on the new classification
 
@@ -1004,9 +1111,9 @@ pbmc_nested_reanalysed <-
 pbmc_nested_reanalysed
 ```
 
-## Sudo-bulk analyses
+## Pseudobulk analyses
 
-It is sometime useful to aggregate cell-wise transcript abundance into sudo-bulk samples. It is possible to explore data and perform hypothesis testing with tools and data-source that we are more familiar with.
+It is sometime useful to aggregate cell-wise transcript abundance into pseudobulk samples. It is possible to explore data and perform hypothesis testing with tools and data-source that we are more familiar with. For more details see [here](https://hbctraining.github.io/scRNA-seq/lessons/pseudobulk_DESeq2_scrnaseq.html).
 
 
 ```{r}
@@ -1061,7 +1168,7 @@ bulk_test =
       tidybulk::identify_abundant(factor_of_interest = groups) %>%
 	    tidybulk::scale_abundance() %>%
       
-      # Hypothesis test
+      # Hypothesis test using default method (edgeR)
       tidybulk::test_differential_abundance(~ groups, action="only") %>%
       slice_head(n=5)
       
@@ -1075,10 +1182,10 @@ bulk_test %>%
 
 ```
 
-## tidySingleCellExperiment
+## tidySingleCellExperiment single-cell analysis
 
-SingleCellExperiment is a very popular container for single cell RNA sequencing data [@sce]. tidySingleCellExperiment provides a bridge between the SingleCellExperiment single-cell package [@sce] and the tidyverse [@wickham2019welcome]. It enables the display of the
-SingleCellExperiment object as a tidyverse tibble, and provides SingleCellExperiment-compatible *dplyr*, *tidyr*, *ggplot* and *plotly* functions.
+As an alternative to Seurat, Bioconductor's SingleCellExperiment is a very popular container for single cell RNA sequencing data [@sce]. tidySingleCellExperiment provides a bridge between the SingleCellExperiment single-cell package [@sce] and the tidyverse [@wickham2019welcome]. It enables the display of the
+SingleCellExperiment object as a tidyverse tibble, and provides SingleCellExperiment-compatible *dplyr*, *tidyr*, *ggplot* and *plotly* functions. Below we show how to perform similar steps to what we already did with Seurat, but this time using tidySingleCellExperiment.
 
 
 ```{r message=FALSE, warning=FALSE}
@@ -1097,7 +1204,7 @@ library(tidySingleCellExperiment)
 ```
 
 
-## Create `tidySingleCellExperiment`
+### Create `tidySingleCellExperiment`
 
 This is a SingleCellExperiment object but it is evaluated as tibble. So it is fully compatible both with SingleCellExperiment and tidyverse APIs. 
 
@@ -1117,7 +1224,7 @@ pbmc_small_tidy
 assayNames(pbmc_small_tidy) # from SummarizedExperiment
 ```
 
-## Polish the data
+### Polish the data
 
 We can interact with our object as we do with any tibble. In this case we want to polish an annotation column.
 
@@ -1134,7 +1241,7 @@ pbmc_small_polished <-
 pbmc_small_polished
 ```
 
-## Calculate the log of the scaled counts
+### Calculate the log of the scaled counts
 
 We can treat `pbmc_small_polished` as a [*SingleCellExperiment* object](https://www.bioconductor.org/packages/release/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html)
 
@@ -1146,7 +1253,7 @@ logcounts(pbmc_small_polished) <- log2(t(t(counts)/size.factors) + 1)  # from Si
 assayNames(pbmc_small_polished)                                        # from SummarizedExperiment
 ```
 
-## Exploratory analyses
+### Exploratory analyses
 
 Here we plot abundance of two transcripts for each group.
 
@@ -1173,9 +1280,9 @@ pbmc_small_polished_abundance %>%
   custom_theme
 ```
 
-## Reduce dimensions
+### Reduce dimensions
 
-### PCA
+#### PCA
 
 We proceed with data processing with Bioconductor packages, such as *scran* [@lun2016pooling] and *scater* [@mccarthy2017scater].
 
@@ -1205,7 +1312,7 @@ pbmc_small_pca %>%
 ```
 
 
-### UMAP
+#### UMAP
 
 Beside PCA which is a linear dimensionality reduction, we can apply neighbour aware methods such as UMAP, to better define locally similar cells. We can calculate the first 3 UMAP dimensions using the scater framework.
 
@@ -1217,7 +1324,7 @@ pbmc_small_UMAP <-
 pbmc_small_UMAP
 ```
 
-## Identify clusters 
+### Identify clusters 
 
 We can proceed with cluster identification with *scran*.
 
@@ -1259,129 +1366,6 @@ pbmc_small_cluster %>%
 
 ```{r, echo=FALSE}
 knitr::include_graphics("../inst/vignettes/plotly.png")
-```
-
-## Plotting heatmap 
-
-### Using scater
-
-```{r}
-plotHeatmap(                                  # from scater
-  pbmc_small_cluster, 
-  features=variable_genes, 
-  columns=order(pbmc_small_cluster$label), 
-  colour_columns_by=c("label")
-) 
-```
-
-### Using tidyverse
-
-```{r}
-pbmc_small_cluster %>%
-  
-  # Get transcript abundance
-  join_transcripts(transcripts=variable_genes) %>%
-  
-  # Plot heatmap
-  heatmap(                                            # from tidyHeatmap
-    .row = transcript,
-    .column = cell, 
-    .value = abundance_logcounts
-  ) %>%
-  
-  # Add annotation
-  add_tile(label) %>%
-  add_point(PC1)
-```
-
-## Cell type classification
-
-We can infer cell type identities using *SingleR* [@aran2019reference] and manipulate the output using tidyverse. SingleR [accepts any log-normalised transcript abundance matrix.](https://bioconductor.org/packages/devel/bioc/vignettes/SingleR/inst/doc/SingleR.html)
-
-```{r eval = FALSE}
-# DO NOT EXECUTE - CELLDEX DEPENDENCY NOT IN BIOCONDUCTOR YET
-
-# Get cell type reference data
-hpca <- HumanPrimaryCellAtlasData()
-
-# Infer cell identities
-cell_type_df <-
-	
-  # extracting counts from SingleCellExperiment object
-  assays(pbmc_small_cluster)$logcounts%>%
-
-	# SingleR
-  SingleR(
-    ref = hpca,
-    labels = hpca$label.main,
-    method = "cluster",
-    clusters = pbmc_small_cluster %>% pull(label)
-  ) %>%
-	
-	# Formatting results
-  as.data.frame() %>%
-  as_tibble(rownames = "label") %>%
-  select(label, first.labels)
-```
-
-We have pre-calculated the cluster classification.
-
-```{r}
-cell_type_df <- ABACBS2020tidytranscriptomics::cell_type_df_sce
-cell_type_df
-```
-
-```{r }
-# Join UMAP and cell type info
-pbmc_small_cell_type <-
-  pbmc_small_cluster %>%
-  left_join(
-    cell_type_df, 
-  	by = "label"
-  )
-
-pbmc_small_cell_type 
-```
-
-We can easily summarise the results. For example, we can see how cell type classification overlaps with cluster classification.
-
-```{r }
-pbmc_small_cell_type %>%
-  count(label, first.labels)
-```
-
-
-##  Nested analyses
-
-A powerful tool we can use with tidySingleCellExperiment is `nest`. We can easily perform independent analyses on subsets of the dataset. First we classify cell types in lymphoid and myeloid; then, nest based on the new classification
-
-```{r}
-pbmc_small_nested <-
-  pbmc_small_cell_type %>%
-  filter(first.labels != "Platelets") %>%
-  mutate(cell_class = 
-           if_else(
-             `first.labels` %in% c("Macrophage", "Monocyte"),
-             "myeloid", 
-             "lymphoid"
-           )
-          ) %>%
-  nest(data = -cell_class)
-
-pbmc_small_nested
-```
-
-Now we can independently perform analyses for the lymphoid and myeloid cell subsets.
-
-```{r, warning=FALSE}
-pbmc_small_nested %>%
-mutate(variable_genes = map_chr(
-  data, ~ .x %>%
-    modelGeneVar() %>%
-    getTopHVGs(prop=0.05) %>% 
-    paste(collapse=", ")
-)) 
-
 ```
 
 
