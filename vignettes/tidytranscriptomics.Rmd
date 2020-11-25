@@ -763,7 +763,7 @@ Some things we don't have time to cover in Part 1 of this workshop can be found 
 
 In Part 1 we showed how we can study the cell-type composition of a biological sample using bulk RNA sequencing.  Single cell sequencing enables a more direct estimation of cell-type composition and gives greater resolution. For bulk RNA sequencing we need to infer the cell types using the abundance of transcripts in the whole sample, with single-cell RNA sequencing we can directly measure the transcripts in each cell and then classify the cells into cell types. 
 
-## tidyseurat
+## Introduction to tidyseurat
 
 Seurat is a very popular analysis toolkit for single cell RNA sequencing data [@butler2018integrating; @stuart2019comprehensive]. tidyseurat provides a bridge between the Seurat single-cell package and the tidyverse. It creates an invisible layer that enables viewing the
 Seurat object as a tidyverse tibble, and provides Seurat-compatible *dplyr*, *tidyr*, *ggplot* and *plotly* functions.
@@ -814,7 +814,7 @@ pbmc_tidy
 Assays(pbmc_tidy)
 ```
 
-### Polish the data
+## Polish the data
 
 We can interact with our object as we do with any tibble. In this case we want to polish an annotation column. We will extract the sample and dataset names from the file name column into separate columns.
 
@@ -831,7 +831,7 @@ pbmc_tidy_clean <-
 pbmc_tidy_clean
 ```
 
-### Quality control
+## Quality control
 
 A key quality control step performed in single cell analysis is assessment of the proportion of mitochondrial transcripts. A high mitochondrial count can indicate the cell is dead or dying and is thus poor quality. A powerful combination of tools we can use with tidyseurat is tidyverse's `nest` and `map`. We can easily perform independent analyses on subsets of the data, for example, we can nest by dataset and use map to iterate the analysis of mitochondrial content across each dataset.
 
@@ -904,7 +904,7 @@ We filter out cells with high mitochondrial content.
 pbmc_alive <- pbmc_annotated %>% filter(!high_mitochondrion)
 ```
 
-### Scaling and Integrating
+## Scaling and Integrating
 
 We need to integrate the different datasets to adjust for technical variability between them. For integration we have chosen 10x_8K (dataset number 3) as reference because it is relatively high quality.
 
@@ -946,7 +946,7 @@ pbmc_integrated <-
   tidy()
 ```
 
-### Reduce dimensions
+## Reduce dimensions
 
 Besides PCA which is a linear dimensionality reduction, we can apply neighbour aware methods such as UMAP, to better define locally similar cells. We can calculate the first 3 UMAP dimensions using the Seurat framework.
 
@@ -975,7 +975,7 @@ pbmc_UMAP %>%
 knitr::include_graphics("../inst/vignettes/plotly_1.png")
 ```
 
-### Identify clusters 
+## Identify clusters 
 
 We proceed with cluster identification with Seurat.
 
@@ -1011,6 +1011,8 @@ pbmc_cluster %>%
 ```{r, echo=FALSE}
 knitr::include_graphics("../inst/vignettes/plotly_2.png")
 ```
+
+## Cell type classification
 
 ### Manual cell type classification
 
@@ -1085,6 +1087,8 @@ How many cells are classified differently by SingleR when analyses are done by c
 
 It is sometime useful to aggregate cell-wise transcript abundance into pseudobulk samples. It is possible to explore data and perform hypothesis testing with tools and data-source that we are more familiar with. For more details see [here](https://hbctraining.github.io/scRNA-seq/lessons/pseudobulk_DESeq2_scrnaseq.html).
 
+### Data exploration using pseudobulk samples
+
 We load the `aggregate_cells` function below from [GitHub Gist](https://gist.github.com/stemangiola/ebce5a3f931b298611b56680d39c073c) and create a group for each sample.
 ```{r}
 
@@ -1152,7 +1156,7 @@ bulk_test %>%
   unnest(test)
 ```
 
-## tidySingleCellExperiment
+## Analyses using Bioconductor and tidySingleCellExperiment
 
 As an alternative to Seurat, Bioconductor's SingleCellExperiment is a very popular container for single cell RNA sequencing data [@sce]. tidySingleCellExperiment provides a bridge between the SingleCellExperiment single-cell package [@sce] and the tidyverse [@wickham2019welcome]. It enables the display of the
 SingleCellExperiment object as a tidyverse tibble, and provides SingleCellExperiment-compatible *dplyr*, *tidyr*, *ggplot* and *plotly* functions. Below we show how to perform similar steps to what we already did with Seurat, but this time using tidySingleCellExperiment and Bioconductor packages.
@@ -1172,7 +1176,6 @@ library(igraph)
 library(SingleR)
 library(tidySingleCellExperiment)
 ```
-
 
 ### Create `tidySingleCellExperiment`
 
@@ -1278,7 +1281,6 @@ pbmc_small_pca %>%
   GGally::ggpairs(columns = 4:8, ggplot2::aes(colour = groups)) +
   custom_theme
 ```
-
 
 #### UMAP
 
