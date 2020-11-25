@@ -768,7 +768,7 @@ Some things we don't have time to cover in Part 1 of this workshop can be found 
 
 # Part 2 Single-cell RNA-seq
 
-[Background information] (https://stemangiola.github.io/ABACBS2020_tidytranscriptomics/articles/background.html#differences-between-bulk-and-single-cell-rna-sequencing-1)
+[Background information](https://stemangiola.github.io/ABACBS2020_tidytranscriptomics/articles/background.html#differences-between-bulk-and-single-cell-rna-sequencing-1)
 
 In Part 1 we showed how we can study the cell-type composition of a biological sample using bulk RNA sequencing.  Single cell sequencing enables a more direct estimation of cell-type composition and gives greater resolution. For bulk RNA sequencing we need to infer the cell types using the abundance of transcripts in the whole sample, with single-cell RNA sequencing we can directly measure the transcripts in each cell and then classify the cells into cell types. 
 
@@ -795,7 +795,7 @@ library(tidyseurat)
 ```
 
 
-The single-cell RNA sequencing data used here is 3000 cells in total, subsetted from 20 samples from 10 peripheral blood mononuclear cell (pbmc) datasets. The datasets include GSE115189 (26), SRR11038995 (27), SCP345 (singlecell.broadinstitute.org), SCP424 (28), SCP591 (29) and 10x-derived 6K and 8K datasets (support.10xgenomics.com/). 
+The single-cell RNA sequencing data used here is 3000 cells in total, subsetted from 20 samples from 10 peripheral blood mononuclear cell (pbmc) datasets. The datasets include GSE115189 [@Freytag2018], SRR11038995 [@Cai2020, SCP345 (singlecell.broadinstitute.org), SCP424 [@Ding2020], SCP591 [@Karagiannis2020] and 10x-derived 6K and 8K datasets (support.10xgenomics.com/). 
 
 ```{r}
 pbmc <- ABACBS2020tidytranscriptomics::pbmc
