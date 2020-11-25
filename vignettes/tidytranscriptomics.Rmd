@@ -429,7 +429,7 @@ _Note: Some of the methods produce columns with different names for similar outp
 de_all %>% rename(deseq2_FDR = deseq2_padj, voom_FDR = voom_adj.P.Val)
 ```
 
-We can select some of the transcripts that look different between methods to investigate further using the [*tidygate*](https://github.com/stemangiola/tidygate) package.
+We can select some of the transcripts that look different between methods in the plot using the [*tidygate*](https://github.com/stemangiola/tidygate) package. We can then investigate these transcripts, for example, by visualising the their counts.
 
 With tidygate, we can interactively draw gates to select points we want using `gate`. We specify which columns we want to plot in the scatterplot, and how many gates we want to draw. We can also specify the opacity if we want to make it easier to see overlapping points.
 
