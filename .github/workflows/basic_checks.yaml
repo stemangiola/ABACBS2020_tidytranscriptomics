@@ -13,7 +13,7 @@ jobs:
           # We'll install the specific versions from the install instructions
           BiocManager::install("stemangiola/tidybulk@v1.2.0")
           BiocManager::install("stemangiola/tidygate@v0.2.8")
-          BiocManager::install("stemangiola/tidyseurat@v0.1.16")
+          BiocManager::install("stemangiola/tidyseurat@v0.1.17")
           BiocManager::install("stemangiola/tidyHeatmap@v1.1.5")
           
           # Then install the other dependencies in the usual way
@@ -27,8 +27,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: /usr/local/lib/R/site-library
-          key: ${{ runner.os }}-r-4-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-r-4-
+          key: ${{ runner.os }}-r-5-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ runner.os }}-r-5-
           
       - name: Install dependencies
         run: |

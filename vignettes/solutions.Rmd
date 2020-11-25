@@ -64,7 +64,7 @@ counts_scal_PCA <-
 
 ### Which method detects the most differentially abundant transcripts, p value adjusted for multiple testing <  0.05 (FDR, adj.P.Val, padj)?
 
-```{r}
+```{r, eval=FALSE}
 # Set up data
 de_all <- 
   
@@ -99,7 +99,7 @@ de_all <-
   ) 
 ```
 
-```{r out.width = "70%"}
+```{r out.width = "70%", eval=FALSE}
 de_all %>%
 	
 	# Subset transcript information

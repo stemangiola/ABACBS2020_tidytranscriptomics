@@ -46,7 +46,7 @@ Alternatively, you could install the workshop using the commands below in R `4.0
 ```
 # Install same versions used in the workshop
 #install.packages('remotes')
-remotes::install_github(c("stemangiola/tidybulk@v1.2.0", "stemangiola/tidygate@v0.2.8", "stemangiola/tidyseurat@v0.1.16", "stemangiola/tidyHeatmap@v1.1.5"))
+remotes::install_github(c("stemangiola/tidybulk@v1.2.0", "stemangiola/tidygate@v0.2.8", "stemangiola/tidyseurat@v0.1.17", "stemangiola/tidyHeatmap@v1.1.5"))
 
 # Install workshop package
 remotes::install_github("stemangiola/ABACBS2020_tidytranscriptomics", build_vignettes = TRUE)
@@ -99,7 +99,7 @@ The workshop format is a 3.5 hour session consisting of hands-on demos, exercise
 
 ### Time outline
 
-Rough guide
+Guide
 
 | Activity                                                | Time |
 |---------------------------------------------------------|------|
@@ -112,8 +112,8 @@ Rough guide
 | **Part 2 Single-cell RNA-seq**                          |      |
 |  *Hands-on Demos*                                       |  90m |
 |      Single-cell analysis with tidyseurat               |      |
-|      Single-cell analysis with tidySingleCellExperiment |      |
 |      Pseudobulk analysis                                |      |
+|      Single-cell analysis with tidySingleCellExperiment |      |
 | Total                                                   | 210m |
 
 ### Workshop goals and objectives

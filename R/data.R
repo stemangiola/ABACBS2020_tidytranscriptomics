@@ -48,6 +48,14 @@
 #' @usage data(cell_type_df_sce)
 "cell_type_df_sce"
 
+#' pbmc
+#'
+#' A Seurat dadaset of single cell RNA sequencing data
+#'
+#' @format  A Seurat object.
+#' @usage data(pbmc)
+"pbmc"
+
 #' de_gate_gates
 #'
 #' Stefano's gate list
