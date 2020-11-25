@@ -842,7 +842,7 @@ pbmc_tidy_clean
 
 ### Quality control
 
-A key quality control step performed in single cell analysis is assessment of the proportion of mitochondrial transcripts. A high mitochondrial count can indicate the cell is dead or dying and is thus poor quality. A powerful tool we can use with tidyseurat is tidyverse `nest`. We can easily perform independent analyses on subsets of the data, for example, we can nest by dataset to analyse the mitochondrial content.
+A key quality control step performed in single cell analysis is assessment of the proportion of mitochondrial transcripts. A high mitochondrial count can indicate the cell is dead or dying and is thus poor quality. A powerful combination of tools we can use with tidyseurat is tidyverse's `nest` and `map`. We can easily perform independent analyses on subsets of the data, for example, we can nest by dataset and use map to iterate the analysis of mitochondrial content across each dataset.
 
 ```{r}
 
@@ -877,10 +877,9 @@ pbmc_annotated =
   
   # Ungroup
   unnest(data)
-  
 ```
 
-We can use tidyverse to easily reshape the data and create beeswarm plots to visualise the mitochondrial content.
+We can use tidyverse to easily reshape the data and create beeswarm plots to visualise the mitochondrial content. Detected is number of genes, sum is total counts.
 
 ```{r}
 pbmc_annotated %>%
@@ -915,8 +914,11 @@ pbmc_alive = pbmc_annotated %>% filter(!high_mitochondrion)
 
 ### Scaling and Integrating
 
+We need to integrate the different datasets to adjust for technical variability between them. For integration we have chosen 10x_8K (dataset number 3) as reference because it is relatively high quality.
+
 ```{r preprocess seurat, message=FALSE, warning=FALSE}
 
+# Scaling within each dataset
 pbmc_scaled_nested = 
   pbmc_alive %>%
   
@@ -925,14 +927,17 @@ pbmc_scaled_nested =
   nest(data = -batch) %>%
   
   # Scaling for each dataset
-  mutate(data = map(data, ~ SCTransform(.x, verbose = FALSE) )) 
+  mutate(data = map(data, ~ SCTransform(.x, verbose = FALSE))) 
 
-# select features
-integration_features <- SelectIntegrationFeatures(pbmc_scaled_nested$data, nfeatures = 3000) 
 
+# Select features
+integration_features <- SelectIntegrationFeatures(pbmc_scaled_nested$data) 
+
+
+# Integrating across the datasets
 pbmc_integrated <- 
   
-  # preparation
+  # Preparation
   PrepSCTIntegration(pbmc_scaled_nested$data, anchor.features = integration_features) %>%
   
   # Anchors identification
@@ -947,7 +952,6 @@ pbmc_integrated <-
   
   # Tidify again
   tidy()
-
 ```
 
 ### Reduce dimensions
@@ -957,7 +961,6 @@ Besides PCA which is a linear dimensionality reduction, we can apply neighbour a
 ```{r umap seurat}
 pbmc_UMAP <-
   pbmc_integrated %>%
-  #FindVariableFeatures(verbose = FALSE) %>%
   RunPCA(verbose = FALSE) %>%
   RunUMAP(reduction = "pca", dims = 1:15, n.components = 3L)
 ```
@@ -1021,7 +1024,7 @@ We can identify cluster markers (genes) using Seurat.
 # Identify top 10 markers per cluster
 markers <-
   pbmc_cluster %>%
-  FindAllMarkers(only.pos = TRUE, min.pct = 0.25, thresh.use = 0.25) %>%
+  FindAllMarkers() %>%
   group_by(cluster) %>%
   top_n(10, avg_logFC)
 
@@ -1086,7 +1089,7 @@ How many cells are classified differently by SingleR when analyses are done by c
 
 It is sometime useful to aggregate cell-wise transcript abundance into pseudobulk samples. It is possible to explore data and perform hypothesis testing with tools and data-source that we are more familiar with. For more details see [here](https://hbctraining.github.io/scRNA-seq/lessons/pseudobulk_DESeq2_scrnaseq.html).
 
-
+We load the `aggregate_cells` function below from [GitHub Gist](https://gist.github.com/stemangiola/ebce5a3f931b298611b56680d39c073c) and create a group for each sample.
 ```{r}
 
 # Load aggregate function
@@ -1101,21 +1104,25 @@ bulk_scaled =
 bulk_scaled
 ```
 
+We create a PCA plot to explore the data. 
+
 ```{r}
-	bulk_scaled %>%
-	
-	# Select variable genes
-	tidybulk::keep_variable(sample, transcript, abundance_RNA_scaled, top = 500) %>%
-	
-	# Take all genes with PCA
-	tidybulk::reduce_dimensions(sample, transcript, abundance_RNA_scaled, method = "PCA", action="get", top = Inf) %>%
-	ggplot(aes(PC1, PC2, color=dataset, label=sample)) + 
-	geom_text() + 
-	custom_theme + 
-	theme(aspect.ratio=1)
+bulk_scaled %>%
+
+# Select variable genes
+tidybulk::keep_variable(sample, transcript, abundance_RNA_scaled, top = 500) %>%
+
+# Take all genes with PCA
+tidybulk::reduce_dimensions(sample, transcript, abundance_RNA_scaled, method = "PCA", on="get") %>%
+ggplot(aes(PC1, PC2, color=dataset, label=sample)) + 
+geom_text() + 
+custom_theme + 
+theme(aspect.ratio=1)
 ```
 
-Differential gene transcript-abundance analyses
+### Pseudobulk differential abundance analyses
+
+We aggregate by sample name and cell type to perform differential expression analysis. 
 
 ```{r}
 bulk_cell_type =
@@ -1135,28 +1142,26 @@ bulk_test =
       
       tidybulk(sample, transcript, abundance_RNA) %>%
       
-      # Scaling
-      tidybulk::identify_abundant(factor_of_interest = groups) %>%
-	    tidybulk::scale_abundance() %>%
+      # Filtering and scaling
+      tidybulk::keep_abundant(factor_of_interest = groups) %>%
+	  tidybulk::scale_abundance() %>%
       
       # Hypothesis test using default method (edgeR)
-      tidybulk::test_differential_abundance(~ groups, action="only") %>%
+      tidybulk::test_differential_abundance(~ groups, action="get") %>%
       slice_head(n=5)
       
   ))
 	
-
+# see what top genes are
 bulk_test %>% 
   select(-data) %>% 
   unnest(test)
-
-
 ```
 
 ## tidySingleCellExperiment single-cell analysis
 
 As an alternative to Seurat, Bioconductor's SingleCellExperiment is a very popular container for single cell RNA sequencing data [@sce]. tidySingleCellExperiment provides a bridge between the SingleCellExperiment single-cell package [@sce] and the tidyverse [@wickham2019welcome]. It enables the display of the
-SingleCellExperiment object as a tidyverse tibble, and provides SingleCellExperiment-compatible *dplyr*, *tidyr*, *ggplot* and *plotly* functions. Below we show how to perform similar steps to what we already did with Seurat, but this time using tidySingleCellExperiment.
+SingleCellExperiment object as a tidyverse tibble, and provides SingleCellExperiment-compatible *dplyr*, *tidyr*, *ggplot* and *plotly* functions. Below we show how to perform similar steps to what we already did with Seurat, but this time using tidySingleCellExperiment and Bioconductor packages.
 
 
 ```{r message=FALSE, warning=FALSE}
@@ -1212,9 +1217,9 @@ pbmc_small_polished <-
 pbmc_small_polished
 ```
 
-### Calculate the log of the scaled counts
+### Scaling
 
-We can treat `pbmc_small_polished` as a [*SingleCellExperiment* object](https://www.bioconductor.org/packages/release/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html)
+We can treat `pbmc_small_polished` as a [*SingleCellExperiment* object](https://www.bioconductor.org/packages/release/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html) and calculate the log counts.
 
 ```{r}
 counts <- assay(pbmc_small_polished, "counts")                         # from SummarizedExperiment
@@ -1239,7 +1244,6 @@ pbmc_small_polished_abundance
 ```
 
 We proceed to plot. 
-_Note: we don't need to create many of these temporary variables. They are created here for educational purposes only._
 
 ```{r}
 pbmc_small_polished_abundance %>%
@@ -1269,7 +1273,6 @@ pbmc_small_pca <-
     runPCA(subset_row=variable_genes)  # from scater
 
 pbmc_small_pca
-
 ```
 
 If a tidyverse-compatible package is not included in the tidySingleCellExperiment collection, we can use `as_tibble` to permanently convert `tidySingleCellExperiment` into a tibble.
@@ -1319,24 +1322,6 @@ Now we can interrogate the object as if it was a regular tibble data frame.
 
 ```{r cluster count}
 pbmc_small_cluster %>% count(groups, label)
-```
-
-And we can plot them using 3D plot using plotly.
-
-```{r umap plot, eval=FALSE}
-pbmc_small_cluster %>%
-  plot_ly(
-    x = ~UMAP1,
-    y = ~UMAP2,
-    z = ~UMAP3,
-    color = ~ label,
-    colors = friendly_cols[1:5]
-  )
-```
-
-
-```{r, echo=FALSE}
-knitr::include_graphics("../inst/vignettes/plotly.png")
 ```
 
 

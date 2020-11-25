@@ -99,7 +99,7 @@ The workshop format is a 3.5 hour session consisting of hands-on demos, exercise
 
 ### Time outline
 
-Rough guide
+Guide
 
 | Activity                                                | Time |
 |---------------------------------------------------------|------|
@@ -112,8 +112,8 @@ Rough guide
 | **Part 2 Single-cell RNA-seq**                          |      |
 |  *Hands-on Demos*                                       |  90m |
 |      Single-cell analysis with tidyseurat               |      |
-|      Single-cell analysis with tidySingleCellExperiment |      |
 |      Pseudobulk analysis                                |      |
+|      Single-cell analysis with tidySingleCellExperiment |      |
 | Total                                                   | 210m |
 
 ### Workshop goals and objectives
