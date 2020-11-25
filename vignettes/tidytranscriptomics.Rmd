@@ -158,7 +158,7 @@ From this tidybulk tibble, we can perform differential expression analysis with 
 ## Filtering lowly transcribed genes  
 Genes with very low counts across all libraries provide little evidence for differential expression and they can interfere with some of the statistical approximations that are used later in the pipeline. They also add to the multiple testing burden when estimating false discovery rates, reducing power to detect differentially expressed genes. These genes should be filtered out prior to further analysis.
 
-We can perform the filtering using tidybulk `keep_abundant` or `identify_abundant`. These functions can use the *edgeR* `filterByExpr` function described in [@law2016rna] to automatically identify the genes with adequate abundance for differential expression testing. By default, this will keep genes with ~10 counts in a minimum number of samples, the number of the samples in the smallest group. In this dataset the smallest group size is four (as we have four dex-treated samples vs four untreated). Alternatively, we could use `identify_abundant` to identify which genes are abundant or not (TRUE/FALSE), rather than just keeping the abundant ones. 
+We can perform the filtering using tidybulk `keep_abundant` or `identify_abundant`. These functions can use the *edgeR* `filterByExpr` function described in [@law2016rna] to automatically identify the genes with adequate abundance for differential expression testing. By default, this will keep genes with ~10 counts in a minimum number of samples, the number of the samples in the smallest group. In this dataset the smallest group size is four (as we have four dex-treated samples versus four untreated). Alternatively, we could use `identify_abundant` to identify which genes are abundant or not (TRUE/FALSE), rather than just keeping the abundant ones. 
 
 ```{r}
 # Filtering counts
@@ -977,7 +977,7 @@ knitr::include_graphics("../inst/vignettes/plotly_1.png")
 
 ## Identify clusters 
 
-We proceed with cluster identification with Seurat.
+We proceed with cluster identification with Seurat. FindNeighbors constructs a Shared Nearest Neighbor (SNN) Graph for a given dataset. The k-nearest neighbours of each cell are first determined. FindClusters identifies clusters of cells by a shared nearest neighbour (SNN). 
 
 ```{r cluster seurat}
 pbmc_cluster <-
@@ -1016,7 +1016,7 @@ knitr::include_graphics("../inst/vignettes/plotly_2.png")
 
 ### Manual cell type classification
 
-We can identify cluster markers (genes) using Seurat.
+We can identify cluster markers (genes) using Seurat. As example, we are selecting the top 10 for each cluster. The function DoHeatmap builds an heatmap of those gene markers across cells.
 
 ```{r}
 # Identify top 10 markers per cluster
@@ -1061,6 +1061,8 @@ cell_type_df_seurat <-
   as_tibble(rownames = "seurat_clusters") %>%
   select(seurat_clusters, first.labels)
 ```
+
+We join the cluster label dataframe to our tidyseurat tibble.
 
 ```{r}
 # Join cell type info
@@ -1122,7 +1124,7 @@ bulk_scaled %>%
 
 ### Pseudobulk differential abundance analyses
 
-We aggregate by sample name and cell type to perform differential expression analysis. 
+We aggregate by sample name and cell type to perform differential expression analysis, comparing pseudo-samples independently for each cell type.. 
 
 ```{r}
 bulk_cell_type <-
@@ -1305,7 +1307,7 @@ pbmc_small_cluster <- pbmc_small_UMAP
 # of the SingleCellExperiment object
 colLabels(pbmc_small_cluster) <- # from SingleCellExperiment
   pbmc_small_pca %>%
-  buildSNNGraph(use.dimred = "PCA") %>% # from scran - shared nearest neighbor
+  buildSNNGraph(use.dimred = "PCA") %>% # from scran - shared nearest neighbour
   cluster_walktrap() %$% # from igraph
   membership %>%
   as.factor()
