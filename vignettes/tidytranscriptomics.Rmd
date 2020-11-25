@@ -122,8 +122,8 @@ data(airway)
 
 # convert to tidybulk tibble
 counts_airway <-
-	airway %>%
-	tidybulk()
+  airway %>%
+  tidybulk()
 
 # take a look
 counts_airway
@@ -139,15 +139,16 @@ With tidyverse, all above steps can be linked with the `%>%`, as shown below. Th
 * the steps can be seen more clearly.
 ```{r}
 # setup data workflow
-counts_tt <- 	
-	airway %>%
-	tidybulk() %>%
-	mutate(sample=str_remove(sample, "SRR1039")) %>%
-	mutate(symbol = AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, 
-	                                      keys = as.character(feature), 
-	                                      keytype = "ENSEMBL", 
-	                                      column="SYMBOL", 
-	                                      multiVals = "first"))
+counts_tt <-
+  airway %>%
+  tidybulk() %>%
+  mutate(sample = str_remove(sample, "SRR1039")) %>%
+  mutate(symbol = AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db,
+    keys = as.character(feature),
+    keytype = "ENSEMBL",
+    column = "SYMBOL",
+    multiVals = "first"
+  ))
 # take a look
 counts_tt
 ```
@@ -161,7 +162,7 @@ We can perform the filtering using tidybulk `keep_abundant` or `identify_abundan
 
 ```{r}
 # Filtering counts
-counts_filtered <- counts_tt %>% keep_abundant(factor_of_interest=dex)
+counts_filtered <- counts_tt %>% keep_abundant(factor_of_interest = dex)
 
 # take a look
 counts_filtered
@@ -186,16 +187,16 @@ We can visualise the difference of abundance densities before and after scaling.
 
 ```{r out.width = "70%"}
 counts_scaled %>%
-    
-    # Reshaping
-	pivot_longer(cols = c("counts", "counts_scaled"), names_to = "source", values_to = "abundance") %>%
-    
-    # Plotting
-	ggplot(aes(x=abundance + 1, color=sample)) +
-	geom_density() +
-	facet_wrap(~source) +
-	scale_x_log10() +
-	custom_theme
+
+  # Reshaping
+  pivot_longer(cols = c("counts", "counts_scaled"), names_to = "source", values_to = "abundance") %>%
+
+  # Plotting
+  ggplot(aes(x = abundance + 1, color = sample)) +
+  geom_density() +
+  facet_wrap(~source) +
+  scale_x_log10() +
+  custom_theme
 ```
 
 In this dataset the distributions of the counts are not very different to each other before scaling but scaling does make the distributions more similar. If we saw a sample with a very different distribution we may need to investigate it.
@@ -207,15 +208,15 @@ As tidybulk smoothly integrates with ggplot2 and other tidyverse packages it can
 ```{r eval=FALSE}
 # tidybulk
 airway %>%
-	tidybulk() %>%
-  keep_abundant(factor_of_interest=dex) %>%
-	scale_abundance() %>%
-	pivot_longer(cols = c("counts", "counts_scaled"), names_to = "source", values_to = "abundance") %>%
-	ggplot(aes(x=abundance + 1, color=sample)) +
-	geom_density() +
-	facet_wrap(~source) +
-	scale_x_log10() +
-	custom_theme
+  tidybulk() %>%
+  keep_abundant(factor_of_interest = dex) %>%
+  scale_abundance() %>%
+  pivot_longer(cols = c("counts", "counts_scaled"), names_to = "source", values_to = "abundance") %>%
+  ggplot(aes(x = abundance + 1, color = sample)) +
+  geom_density() +
+  facet_wrap(~source) +
+  scale_x_log10() +
+  custom_theme
 ```
 
 
@@ -228,34 +229,34 @@ airway %>%
 library(edgeR)
 dgList <- SE2DGEList(airway)
 group <- factor(dgList$samples$dex)
-keep.exprs <- filterByExpr(dgList, group=group)
-dgList <- dgList[keep.exprs,, keep.lib.sizes=FALSE]
+keep.exprs <- filterByExpr(dgList, group = group)
+dgList <- dgList[keep.exprs, , keep.lib.sizes = FALSE]
 nsamples <- ncol(dgList)
 logcounts <- log2(dgList$counts)
 
 # Setup graphics
 col <- RColorBrewer::brewer.pal(nsamples, "Paired")
-par(mfrow=c(1,2))
+par(mfrow = c(1, 2))
 
 # Plot raw counts
-plot(density(logcounts[,1]), col=col[1], lwd=2, ylim=c(0,0.26), las=2, main="", xlab="")
-title(main="Counts")
-for (i in 2:nsamples){
-  den <- density(logcounts[,i])
-  lines(den$x, den$y, col=col[i], lwd=2)
+plot(density(logcounts[, 1]), col = col[1], lwd = 2, ylim = c(0, 0.26), las = 2, main = "", xlab = "")
+title(main = "Counts")
+for (i in 2:nsamples) {
+  den <- density(logcounts[, i])
+  lines(den$x, den$y, col = col[i], lwd = 2)
 }
-legend("topright", legend=dgList$samples$Run, text.col=col, bty="n")
+legend("topright", legend = dgList$samples$Run, text.col = col, bty = "n")
 
 # Plot scaled counts
 dgList_norm <- calcNormFactors(dgList)
-lcpm_n <- cpm(dgList_norm, log=TRUE)
-plot(density(lcpm_n[,1]), col=col[1], lwd=2, ylim=c(0,0.26), las=2, main="", xlab="")
+lcpm_n <- cpm(dgList_norm, log = TRUE)
+plot(density(lcpm_n[, 1]), col = col[1], lwd = 2, ylim = c(0, 0.26), las = 2, main = "", xlab = "")
 title("Counts scaled")
-for (i in 2:nsamples){
-  den <- density(lcpm_n[,i])
-  lines(den$x, den$y, col=col[i], lwd=2)
+for (i in 2:nsamples) {
+  den <- density(lcpm_n[, i])
+  lines(den$x, den$y, col = col[i], lwd = 2)
 }
-legend("topright", legend=dgList_norm$samples$Run, text.col=col, bty="n")
+legend("topright", legend = dgList_norm$samples$Run, text.col = col, bty = "n")
 ```
 
 
@@ -270,7 +271,7 @@ By far, one of the most important plots we make when we analyse RNA sequencing d
 # Get principal components
 counts_scal_PCA <-
   counts_scaled %>%
-  reduce_dimensions(method="PCA")
+  reduce_dimensions(method = "PCA")
 ```
 
 ```{poll_4 class.source="poll"}
@@ -296,11 +297,11 @@ We can now plot the reduced dimensions.
 ```{r out.width = "70%"}
 # PCA plot
 counts_scal_PCA %>%
-	pivot_sample() %>%
-	ggplot(aes(x=PC1, y=PC2, colour=dex, shape=cell)) +
-	geom_point() +
-	geom_text_repel(aes(label=sample), show.legend = FALSE) +
-	custom_theme
+  pivot_sample() %>%
+  ggplot(aes(x = PC1, y = PC2, colour = dex, shape = cell)) +
+  geom_point() +
+  geom_text_repel(aes(label = sample), show.legend = FALSE) +
+  custom_theme
 ```
 
 The samples separate by treatment on PC1 which is what we hope to see. PC2 separates the N080611 cell line from the other samples, indicating a greater difference between that cell line and the others.
@@ -312,17 +313,17 @@ An alternative to principal component analysis for examining relationships betwe
 
 ```{r out.width = "70%"}
 counts_scal_PCA %>%
-    
-	# extract 500 most variable genes
-	keep_variable(.abundance = counts_scaled, top = 500) %>%
-    
-	# create heatmap
-	heatmap(
-	      .column = sample,
-	      .row = feature,
-	      .value = counts_scaled,
-	      transform = log1p
-	) %>%
+
+  # extract 500 most variable genes
+  keep_variable(.abundance = counts_scaled, top = 500) %>%
+
+  # create heatmap
+  heatmap(
+    .column = sample,
+    .row = feature,
+    .value = counts_scaled,
+    transform = log1p
+  ) %>%
   add_tile(dex) %>%
   add_tile(cell)
 ```
@@ -338,16 +339,16 @@ Tidybulk enables a simplified way of generating a clustered heatmap of variable 
 library(edgeR)
 dgList <- SE2DGEList(airway)
 group <- factor(dgList$samples$dex)
-keep.exprs <- filterByExpr(dgList, group=group)
-dgList <- dgList[keep.exprs,, keep.lib.sizes=FALSE]
+keep.exprs <- filterByExpr(dgList, group = group)
+dgList <- dgList[keep.exprs, , keep.lib.sizes = FALSE]
 dgList <- calcNormFactors(dgList)
-logcounts <- cpm(dgList, log=TRUE)
+logcounts <- cpm(dgList, log = TRUE)
 var_genes <- apply(logcounts, 1, var)
-select_var <- names(sort(var_genes, decreasing=TRUE))[1:500]
-highly_variable_lcpm <- logcounts[select_var,]
-colours <- c("#440154FF", "#21908CFF", "#fefada" )
-col.group <- c("red","grey")[group]
-gplots::heatmap.2(highly_variable_lcpm, col=colours, trace="none", ColSideColors=col.group, scale="row")
+select_var <- names(sort(var_genes, decreasing = TRUE))[1:500]
+highly_variable_lcpm <- logcounts[select_var, ]
+colours <- c("#440154FF", "#21908CFF", "#fefada")
+col.group <- c("red", "grey")[group]
+gplots::heatmap.2(highly_variable_lcpm, col = colours, trace = "none", ColSideColors = col.group, scale = "row")
 ```
 
 
@@ -358,37 +359,37 @@ gplots::heatmap.2(highly_variable_lcpm, col=colours, trace="none", ColSideColors
 We give `test_differential_abundance` our tidybulk counts object and a formula, specifying the column that contains our groups to be compared. If all our samples were from the same cell line, and there were no additional factors contributing variance such as batch differences, we could use the formula `~ dex`. However, each treated and untreated sample is from a different cell line so we add the cell line as an additional factor `~ dex + cell`. 
 
 ```{r message=FALSE}
-de_all <- 
-  
+de_all <-
+
   counts_scal_PCA %>%
-  
+
   # edgeR QLT
   test_differential_abundance(
-    ~ dex + cell, 
+    ~ dex + cell,
     method = "edgeR_quasi_likelihood",
     prefix = "edgerQLT_"
-  )  %>%
-  
+  ) %>%
+
   # edgeR LRT
   test_differential_abundance(
-    ~ dex + cell, 
+    ~ dex + cell,
     method = "edgeR_likelihood_ratio",
     prefix = "edgerLR_"
-  )  %>%
-  
+  ) %>%
+
   # limma-voom
   test_differential_abundance(
-    ~ dex + cell, 
+    ~ dex + cell,
     method = "limma_voom",
     prefix = "voom_"
   ) %>%
-  
+
   # DESeq2
   test_differential_abundance(
-    ~ dex + cell,  
+    ~ dex + cell,
     method = "deseq2",
     prefix = "deseq2_"
-  ) 
+  )
 
 # take a look
 
@@ -434,15 +435,15 @@ We can select some of the transcripts that look different between methods in the
 With tidygate, we can interactively draw gates to select points we want using `gate`. We specify which columns we want to plot in the scatterplot, and how many gates we want to draw. We can also specify the opacity if we want to make it easier to see overlapping points.
 
 ```{r, eval=FALSE}
-de_gate <- 
+de_gate <-
   de_all %>%
-  
+
   tidygate::gate(
     feature,
-    edgerQLT_PValue, 
-    deseq2_pvalue, 
-    opacity=0.3, 
-    how_many_gates = 2 
+    edgerQLT_PValue,
+    deseq2_pvalue,
+    opacity = 0.3,
+    how_many_gates = 2
   )
 ```
 
@@ -455,13 +456,14 @@ That will add a column called gate, specifying which gate the points (transcript
 
 ```{r echo=FALSE}
 # using pre-selected gates just to render the html version of this document
-de_gate <- 
+de_gate <-
   de_all %>%
-  
+
   tidygate::gate(
     feature,
-    edgerQLT_PValue, 
-    deseq2_pvalue, gate_list = ABACBS2020tidytranscriptomics::de_gate_gates
+    edgerQLT_PValue,
+    deseq2_pvalue,
+    gate_list = ABACBS2020tidytranscriptomics::de_gate_gates
   )
 
 de_gate
@@ -470,33 +472,33 @@ de_gate
 We can check how many transcripts we've got in each gate.
 
 ```{r}
-de_gate %>% 
-    pivot_transcript() %>% 
-    count(gate)
+de_gate %>%
+  pivot_transcript() %>%
+  count(gate)
 ```
 
 We can now select the transcripts from our two gates i.e. more significant in edgeR (gate 1) and more significant in DESeq2 (gate 2).
 
 ```{r}
-de_gate %>% 
-  
+de_gate %>%
+
   # Filter for transcripts within the gates
-  filter(gate > 0) %>% 
-  
+  filter(gate > 0) %>%
+
   # Rename for clarity
   mutate(gate = case_when(
     gate == 1 ~ "more in edgeR",
     gate == 2 ~ "more in DESeq2",
     TRUE ~ gate
   )) %>%
-  
+
   # Order the plots for the transcripts
   mutate(feature = forcats::fct_reorder(feature, edgerQLT_PValue, min)) %>%
-  
+
   # Plot
-  ggplot(aes(dex, counts_scaled, color=gate)) +
+  ggplot(aes(dex, counts_scaled, color = gate)) +
   geom_point() +
-  facet_wrap(~feature, scale="free_y") +
+  facet_wrap(~feature, scale = "free_y") +
   custom_theme
 ```
 
@@ -504,8 +506,8 @@ This enables us to see, for example, that DESeq2 produces a more conservative lo
 
 ```{r}
 de_gate %>%
-  pivot_transcript %>%
-  filter(feature == "ENSG00000104725")%>%
+  pivot_transcript() %>%
+  filter(feature == "ENSG00000104725") %>%
   select(edgerQLT_logFC, deseq2_log2FoldChange)
 ```
 
@@ -515,7 +517,7 @@ If we just wanted to run one differential testing method we could do that. The d
 
 ```{r}
 counts_de <- counts_scal_PCA %>%
-    test_differential_abundance(~ dex + cell)
+  test_differential_abundance(~ dex + cell)
 ```
 
 Tidybulk enables a simplified way of performing an RNA sequencing differential expression analysis (with the benefit of smoothly integrating with ggplot2 and other tidyverse packages). Compare the code for a tidybulk edgeR analysis versus standard edgeR below.
@@ -527,15 +529,15 @@ Tidybulk enables a simplified way of performing an RNA sequencing differential e
 library(edgeR)
 dgList <- SE2DGEList(airway)
 group <- factor(dgList$samples$dex)
-keep.exprs <- filterByExpr(dgList, group=group)
-dgList <- dgList[keep.exprs,, keep.lib.sizes=FALSE]
+keep.exprs <- filterByExpr(dgList, group = group)
+dgList <- dgList[keep.exprs, , keep.lib.sizes = FALSE]
 dgList <- calcNormFactors(dgList)
 cell <- factor(dgList$samples$cell)
 design <- model.matrix(~ 0 + group + cell)
 dgList <- estimateDisp(dgList, design)
 fit <- glmQLFit(dgList, design)
-TvsU <- makeContrasts(TvsU=grouptrt-groupuntrt, levels=design)
-qlf <- glmQLFTest(fit, contrast=TvsU)
+TvsU <- makeContrasts(TvsU = grouptrt - groupuntrt, levels = design)
+qlf <- glmQLFTest(fit, contrast = TvsU)
 ```
 
 
@@ -545,10 +547,10 @@ We'll extract the symbols for a few top genes (by P value) to use in some of the
 
 ```{r}
 topgenes_symbols <-
-	counts_de %>%
-	pivot_transcript() %>%
-	arrange(PValue) %>%
-	head(6) %>% 
+  counts_de %>%
+  pivot_transcript() %>%
+  arrange(PValue) %>%
+  head(6) %>%
   pull(symbol)
 ```
 
@@ -559,32 +561,32 @@ Volcano plots are a useful genome-wide plot for checking that the analysis looks
 ```{r out.width = "70%"}
 # volcano plot, minimal
 counts_de %>%
-	ggplot(aes(x=logFC, y=PValue, colour=FDR < 0.05)) +
-	geom_point() +
-	scale_y_continuous(trans = "log10_reverse") +
-	custom_theme
+  ggplot(aes(x = logFC, y = PValue, colour = FDR < 0.05)) +
+  geom_point() +
+  scale_y_continuous(trans = "log10_reverse") +
+  custom_theme
 ```
 
 A more informative plot, integrating some of the packages in tidyverse.
 
 ```{r out.width = "70%", warning=FALSE}
 counts_de %>%
-	pivot_transcript() %>%
+  pivot_transcript() %>%
 
   # Subset data
-	mutate(significant = FDR<0.05 & abs(logFC) >=2) %>%
-	mutate(symbol = ifelse(symbol %in% topgenes_symbols, as.character(symbol), "")) %>%
+  mutate(significant = FDR < 0.05 & abs(logFC) >= 2) %>%
+  mutate(symbol = ifelse(symbol %in% topgenes_symbols, as.character(symbol), "")) %>%
 
   # Plot
-	ggplot(aes(x = logFC, y = PValue, label=symbol)) +
-	geom_point(aes(color = significant, size = significant, alpha=significant)) +
-	geom_text_repel() +
+  ggplot(aes(x = logFC, y = PValue, label = symbol)) +
+  geom_point(aes(color = significant, size = significant, alpha = significant)) +
+  geom_text_repel() +
 
-	# Custom scales
+  # Custom scales
   custom_theme +
-	scale_y_continuous(trans = "log10_reverse") +
-	scale_color_manual(values=c("black", "#e11f28")) +
-	scale_size_discrete(range = c(0, 2))
+  scale_y_continuous(trans = "log10_reverse") +
+  scale_color_manual(values = c("black", "#e11f28")) +
+  scale_size_discrete(range = c(0, 2))
 ```
 
 ### Stripcharts
@@ -595,18 +597,18 @@ With stripcharts we can see if replicates tend to group together and how the exp
 
 ```{r out.width = "70%"}
 strip_chart <-
-	counts_scaled %>%
+  counts_scaled %>%
 
-	# extract counts for top differentially expressed genes
-	filter(symbol %in% topgenes_symbols) %>%
+  # extract counts for top differentially expressed genes
+  filter(symbol %in% topgenes_symbols) %>%
 
-	# make faceted stripchart
-	ggplot(aes(x = dex, y = counts_scaled + 1, fill = dex, label = sample)) +
-	geom_boxplot() +
-	geom_jitter() +
-	facet_wrap(~symbol) +
-	scale_y_log10()+
-	custom_theme
+  # make faceted stripchart
+  ggplot(aes(x = dex, y = counts_scaled + 1, fill = dex, label = sample)) +
+  geom_boxplot() +
+  geom_jitter() +
+  facet_wrap(~symbol) +
+  scale_y_log10() +
+  custom_theme
 
 strip_chart
 ```
@@ -639,9 +641,9 @@ If we are sequencing tissue samples, we may want to know what cell types are pre
 For this example we will use a subset of the breast cancer dataset from [The Cancer Genome Atlas (TCGA)](https://www.cancer.gov/tcga). 
 
 ```{r}
-BRCA_tidy <- 
-	ABACBS2020tidytranscriptomics::BRCA %>%
-	tidybulk(patient, transcript, count)
+BRCA_tidy <-
+  ABACBS2020tidytranscriptomics::BRCA %>%
+  tidybulk(patient, transcript, count)
 
 BRCA_tidy
 ```
@@ -649,9 +651,9 @@ BRCA_tidy
 With tidybulk, we can easily infer the proportions of cell types within a tissue using one of several published methods (Cibersort [@newman2015robust], EPIC [@racle2017simultaneous] and llsr [@abbas2009deconvolution]). Here we will use Cibersort which provides a default signature called LM22 to define the cell types. LM22 contains 547 genes that identify 22 human immune cell types.
 
 ```{r}
-BRCA_cell_type <- 
-	BRCA_tidy %>%
-	deconvolve_cellularity(action="get", cores = 1)
+BRCA_cell_type <-
+  BRCA_tidy %>%
+  deconvolve_cellularity(action = "get", cores = 1)
 
 BRCA_cell_type
 ```
@@ -659,16 +661,16 @@ BRCA_cell_type
 Cell type proportions are added to the tibble as new columns. The prefix makes it easy to reshape the data frame if needed, for visualisation or further analyses.
 
 ```{r}
-BRCA_cell_type_long <- 
-	BRCA_cell_type %>%
-	
-	# Reshape
-	pivot_longer(
-		contains("cibersort"), 
-		names_prefix = "cibersort: ", 
-		names_to = "cell_type",
-		values_to = "proportion"
-	) 
+BRCA_cell_type_long <-
+  BRCA_cell_type %>%
+
+  # Reshape
+  pivot_longer(
+    contains("cibersort"),
+    names_prefix = "cibersort: ",
+    names_to = "cell_type",
+    values_to = "proportion"
+  )
 
 BRCA_cell_type_long
 ```
@@ -677,35 +679,33 @@ We can plot the proportions of immune cell types for each patient.
 
 ```{r}
 BRCA_cell_type_long %>%
-	
+
   # Plot proportions
-  ggplot(aes(x=patient, y=proportion, fill=cell_type)) +
+  ggplot(aes(x = patient, y = proportion, fill = cell_type)) +
   geom_bar(stat = "identity") +
-  custom_theme 
+  custom_theme
 ```
 
 We can visualise the similarity of the tissue composition for the patients by performing a dimensionality reduction on cell type and proportion (rather than on transcript and counts as we did previously).
 
 ```{r warning=FALSE}
 BRCA_cell_type_long %>%
-    
-    # Filter cell types with proportion zero in all patients
-    group_by(cell_type) %>% 
-    filter(sum(proportion) > 0) %>%
-    ungroup() %>%
-	
-	reduce_dimensions(
-		patient, 
-		cell_type, 
-		proportion, 
-		method="PCA", 
-		action="get"
-	) %>%
-	
-	ggplot(aes(PC1, PC2, label=patient)) +
-	geom_point(color="red") +
-	ggrepel::geom_text_repel(size=3) +
-	custom_theme
+
+  # Filter cell types with proportion zero in all patients
+  group_by(cell_type) %>%
+  filter(sum(proportion) > 0) %>%
+  ungroup() %>%
+  reduce_dimensions(
+    patient,
+    cell_type,
+    proportion,
+    method = "PCA",
+    action = "get"
+  ) %>%
+  ggplot(aes(PC1, PC2, label = patient)) +
+  geom_point(color = "red") +
+  ggrepel::geom_text_repel(size = 3) +
+  custom_theme
 ```
 
 ```{poll_8 class.source="poll"}
@@ -717,27 +717,27 @@ We can also perform differential tissue composition analyses, similar to how we 
 ```{r}
 library(survival)
 
-BRCA_tidy_survival <- 
-	BRCA_tidy %>%
-	test_differential_cellularity(Surv(time, event_occurred) ~ .	, cores = 1) %>%
-	arrange(p.value)
+BRCA_tidy_survival <-
+  BRCA_tidy %>%
+  test_differential_cellularity(Surv(time, event_occurred) ~ ., cores = 1) %>%
+  arrange(p.value)
 
 BRCA_tidy_survival %>%
-	dplyr::select(.cell_type, p.value, everything())
+  dplyr::select(.cell_type, p.value, everything())
 ```
 
 We can visualise the proportions for the cell types most associated with survival.
 
 ```{r}
 BRCA_tidy_survival %>%
-	dplyr::slice(1:2) %>%
-	unnest(cell_type_proportions) %>%
-	ggplot(aes(time, .proportion, color = factor(event_occurred))) +
-	geom_point() +
-	facet_wrap(~ .cell_type) +
-	scale_x_log10() +
-	scale_y_continuous(trans = "logit") +
-	custom_theme
+  dplyr::slice(1:2) %>%
+  unnest(cell_type_proportions) %>%
+  ggplot(aes(time, .proportion, color = factor(event_occurred))) +
+  geom_point() +
+  facet_wrap(~.cell_type) +
+  scale_x_log10() +
+  scale_y_continuous(trans = "logit") +
+  custom_theme
 ```
 
 
@@ -820,13 +820,13 @@ We can interact with our object as we do with any tibble. In this case we want t
 
 ```{r}
 pbmc_tidy_clean <-
-	pbmc_tidy %>%
-	
-	# Extract sample and group
-	extract(file, "sample", "../data/([a-zA-Z0-9_]+)/outs.+", remove = FALSE) %>%
-  
-  	# Extract data source
-	extract(file, c("dataset", "groups"), "../data/([a-zA-Z0-9_]+)_([0-9])/outs.+")
+  pbmc_tidy %>%
+
+  # Extract sample and group
+  extract(file, "sample", "../data/([a-zA-Z0-9_]+)/outs.+", remove = FALSE) %>%
+
+  # Extract data source
+  extract(file, c("dataset", "groups"), "../data/([a-zA-Z0-9_]+)_([0-9])/outs.+")
 
 pbmc_tidy_clean
 ```
@@ -839,33 +839,33 @@ A key quality control step performed in single cell analysis is assessment of th
 
 # Gene product location
 location <- mapIds(
-  EnsDb.Hsapiens.v86, 
-  keys=rownames(pbmc_tidy_clean), 
-  column="SEQNAME",
-  keytype="SYMBOL"
+  EnsDb.Hsapiens.v86,
+  keys = rownames(pbmc_tidy_clean),
+  column = "SEQNAME",
+  keytype = "SYMBOL"
 )
 
-pbmc_annotated = 
+pbmc_annotated <-
   pbmc_tidy_clean %>%
-  
+
   # Grouping - nesting
   nest(data = -dataset) %>%
   mutate(data = map(
-    data, 
-    
+    data,
+
     # Join mitochondrion statistics
     ~ left_join(
-        .x ,
-        # Calculating metrics
-        perCellQCMetrics(.@assays$RNA@counts, subsets=list(Mito=which(location=="MT"))) %>%
-        as_tibble(rownames="cell"),
-      by="cell"
+      .x,
+      # Calculating metrics
+      perCellQCMetrics(.@assays$RNA@counts, subsets = list(Mito = which(location == "MT"))) %>%
+        as_tibble(rownames = "cell"),
+      by = "cell"
     ) %>%
-  
-    # Label cells
-    mutate(high_mitochondrion = isOutlier(subsets_Mito_percent, type="higher")) 
+
+      # Label cells
+      mutate(high_mitochondrion = isOutlier(subsets_Mito_percent, type = "higher"))
   )) %>%
-  
+
   # Ungroup
   unnest(data)
 ```
@@ -874,24 +874,25 @@ We can use tidyverse to easily reshape the data and create beeswarm plots to vis
 
 ```{r}
 pbmc_annotated %>%
-    
-    # Reshaping
-    pivot_longer(c(detected, sum, subsets_Mito_percent)) %>%
-    ggplot(aes(x=dataset,y=value,
-                         color = high_mitochondrion, 
-                         alpha=high_mitochondrion,
-                         size= high_mitochondrion
-    )) +
-    
-    # Plotting
-    ggbeeswarm::geom_quasirandom() +
-    facet_wrap(~name, scale="free_y") +
-    
-    # Customisation
-    scale_color_manual(values=c("black", "#e11f28")) +
-    scale_size_discrete(range = c(0, 2)) +
-    theme_bw() +
-    theme(axis.text.x = element_text(angle = 50, hjust = 1, vjust = 1))
+
+  # Reshaping
+  pivot_longer(c(detected, sum, subsets_Mito_percent)) %>%
+  ggplot(aes(
+    x = dataset, y = value,
+    color = high_mitochondrion,
+    alpha = high_mitochondrion,
+    size = high_mitochondrion
+  )) +
+
+  # Plotting
+  ggbeeswarm::geom_quasirandom() +
+  facet_wrap(~name, scale = "free_y") +
+
+  # Customisation
+  scale_color_manual(values = c("black", "#e11f28")) +
+  scale_size_discrete(range = c(0, 2)) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 50, hjust = 1, vjust = 1))
 ```
 ```{poll_5 class.source="poll"}
 What is the ID of the cell with the highest mitochondrial relative content?
@@ -900,7 +901,7 @@ What is the ID of the cell with the highest mitochondrial relative content?
 We filter out cells with high mitochondrial content.
 
 ```{r}
-pbmc_alive = pbmc_annotated %>% filter(!high_mitochondrion)
+pbmc_alive <- pbmc_annotated %>% filter(!high_mitochondrion)
 ```
 
 ### Scaling and Integrating
@@ -910,37 +911,37 @@ We need to integrate the different datasets to adjust for technical variability 
 ```{r preprocess seurat, message=FALSE, warning=FALSE}
 
 # Scaling within each dataset
-pbmc_scaled_nested = 
+pbmc_scaled_nested <-
   pbmc_alive %>%
-  
+
   # Define batch
   mutate(batch = dataset) %>%
   nest(data = -batch) %>%
-  
+
   # Scaling for each dataset
-  mutate(data = map(data, ~ SCTransform(.x, verbose = FALSE))) 
+  mutate(data = map(data, ~ SCTransform(.x, verbose = FALSE)))
 
 
 # Select features
-integration_features <- SelectIntegrationFeatures(pbmc_scaled_nested$data) 
+integration_features <- SelectIntegrationFeatures(pbmc_scaled_nested$data)
 
 
 # Integrating across the datasets
-pbmc_integrated <- 
-  
+pbmc_integrated <-
+
   # Preparation
   PrepSCTIntegration(pbmc_scaled_nested$data, anchor.features = integration_features) %>%
-  
+
   # Anchors identification
   FindIntegrationAnchors(
-    normalization.method = "SCT", 
+    normalization.method = "SCT",
     anchor.features = integration_features,
     reference = 3
   ) %>%
-  
+
   # Integrate
   IntegrateData(normalization.method = "SCT") %>%
-  
+
   # Tidify again
   tidy()
 ```
@@ -964,8 +965,8 @@ pbmc_UMAP %>%
     x = ~`UMAP_1`,
     y = ~`UMAP_2`,
     z = ~`UMAP_3`,
-    colors = friendly_cols[1:10], 
-    color = ~ dataset
+    colors = friendly_cols[1:10],
+    color = ~dataset
   )
 ```
 
@@ -1002,8 +1003,8 @@ pbmc_cluster %>%
     x = ~`UMAP_1`,
     y = ~`UMAP_2`,
     z = ~`UMAP_3`,
-    colors = friendly_cols[1:10], 
-    color = ~ seurat_clusters
+    colors = friendly_cols[1:10],
+    color = ~seurat_clusters
   )
 ```
 
@@ -1041,19 +1042,19 @@ We can infer cell type identities (e.g. T cell) using *SingleR* [@aran2019refere
 blueprint <- BlueprintEncodeData()
 
 cell_type_df_seurat <-
-	
-# extracting counts from Seurat object
+
+  # extracting counts from Seurat object
   pbmc_cluster@assays[["SCT"]]@counts %>%
   log1p() %>%
 
-	# SingleR
+  # SingleR
   SingleR(
     ref = blueprint,
     labels = blueprint$label.main,
-    clusters =  pbmc_cluster$seurat_clusters
+    clusters = pbmc_cluster$seurat_clusters
   ) %>%
-	
-	# Formatting results
+
+  # Formatting results
   as.data.frame() %>%
   as_tibble(rownames = "seurat_clusters") %>%
   select(seurat_clusters, first.labels)
@@ -1090,11 +1091,11 @@ We load the `aggregate_cells` function below from [GitHub Gist](https://gist.git
 # Load aggregate function
 devtools::source_gist("ebce5a3f931b298611b56680d39c073c")
 
-bulk_scaled =
-	pbmc_cell_type %>%
-	aggregate_cells(sample) %>%
-	tidybulk::identify_abundant(sample, transcript, abundance_RNA, factor_of_interest = groups) %>%
-	tidybulk::scale_abundance(sample, transcript, abundance_RNA) 
+bulk_scaled <-
+  pbmc_cell_type %>%
+  aggregate_cells(sample) %>%
+  tidybulk::identify_abundant(sample, transcript, abundance_RNA, factor_of_interest = groups) %>%
+  tidybulk::scale_abundance(sample, transcript, abundance_RNA)
 
 bulk_scaled
 ```
@@ -1104,15 +1105,15 @@ We create a PCA plot to explore the data.
 ```{r}
 bulk_scaled %>%
 
-# Select variable genes
-tidybulk::keep_variable(sample, transcript, abundance_RNA_scaled, top = 500) %>%
+  # Select variable genes
+  tidybulk::keep_variable(sample, transcript, abundance_RNA_scaled, top = 500) %>%
 
-# Take all genes with PCA
-tidybulk::reduce_dimensions(sample, transcript, abundance_RNA_scaled, method = "PCA", on="get") %>%
-ggplot(aes(PC1, PC2, color=dataset, label=sample)) + 
-geom_text() + 
-custom_theme + 
-theme(aspect.ratio=1)
+  # Take all genes with PCA
+  tidybulk::reduce_dimensions(sample, transcript, abundance_RNA_scaled, method = "PCA", on = "get") %>%
+  ggplot(aes(PC1, PC2, color = dataset, label = sample)) +
+  geom_text() +
+  custom_theme +
+  theme(aspect.ratio = 1)
 ```
 
 ### Pseudobulk differential abundance analyses
@@ -1120,36 +1121,34 @@ theme(aspect.ratio=1)
 We aggregate by sample name and cell type to perform differential expression analysis. 
 
 ```{r}
-bulk_cell_type =
-	pbmc_cell_type %>%
-	aggregate_cells(c(sample, first.labels )) 
+bulk_cell_type <-
+  pbmc_cell_type %>%
+  aggregate_cells(c(sample, first.labels))
 
 # Scaling
-bulk_test = 
+bulk_test <-
 
   bulk_cell_type %>%
   nest(data = -first.labels) %>%
-  
+
   # Nested analyses
   mutate(test = map(
-    data, 
+    data,
     ~ .x %>%
-      
       tidybulk(sample, transcript, abundance_RNA) %>%
-      
+
       # Filtering and scaling
       tidybulk::keep_abundant(factor_of_interest = groups) %>%
-	  tidybulk::scale_abundance() %>%
-      
+      tidybulk::scale_abundance() %>%
+
       # Hypothesis test using default method (edgeR)
-      tidybulk::test_differential_abundance(~ groups, action="get") %>%
-      slice_head(n=5)
-      
+      tidybulk::test_differential_abundance(~groups, action = "get") %>%
+      slice_head(n = 5)
   ))
-	
+
 # see what top genes are
-bulk_test %>% 
-  select(-data) %>% 
+bulk_test %>%
+  select(-data) %>%
   unnest(test)
 ```
 
@@ -1201,13 +1200,13 @@ We can interact with our object as we do with any tibble. In this case we want t
 
 ```{r}
 pbmc_small_polished <-
-	pbmc_small_tidy %>%
-	
-	# Clean groups
-	mutate(groups = groups %>% str_remove("^g")) %>%
-	
-	# Extract sample
-	extract(file, "sample", "../data/sample([a-z0-9]+)/outs.+")
+  pbmc_small_tidy %>%
+
+  # Clean groups
+  mutate(groups = groups %>% str_remove("^g")) %>%
+
+  # Extract sample
+  extract(file, "sample", "../data/sample([a-z0-9]+)/outs.+")
 
 pbmc_small_polished
 ```
@@ -1217,11 +1216,11 @@ pbmc_small_polished
 We can treat `pbmc_small_polished` as a [*SingleCellExperiment* object](https://www.bioconductor.org/packages/release/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html) and calculate the log counts.
 
 ```{r}
-counts <- assay(pbmc_small_polished, "counts")                         # from SummarizedExperiment
+counts <- assay(pbmc_small_polished, "counts") # from SummarizedExperiment
 libsizes <- colSums(counts)
-size.factors <- libsizes/mean(libsizes)
-logcounts(pbmc_small_polished) <- log2(t(t(counts)/size.factors) + 1)  # from SingleCellExperiment
-assayNames(pbmc_small_polished)                                        # from SummarizedExperiment
+size.factors <- libsizes / mean(libsizes)
+logcounts(pbmc_small_polished) <- log2(t(t(counts) / size.factors) + 1) # from SingleCellExperiment
+assayNames(pbmc_small_polished) # from SummarizedExperiment
 ```
 
 ### Exploratory analyses
@@ -1229,12 +1228,12 @@ assayNames(pbmc_small_polished)                                        # from Su
 Here we plot abundance of two transcripts for each group.
 
 ```{r}
-pbmc_small_polished_abundance = 
+pbmc_small_polished_abundance <-
   pbmc_small_polished %>%
-  
+
   # Extract abundance
-  join_transcripts(transcripts=c("HLA-DRA", "TCL1A")) 
-  
+  join_transcripts(transcripts = c("HLA-DRA", "TCL1A"))
+
 pbmc_small_polished_abundance
 ```
 
@@ -1242,11 +1241,11 @@ We proceed to plot.
 
 ```{r}
 pbmc_small_polished_abundance %>%
-  ggplot2::ggplot(aes(groups, abundance_counts + 1, fill=groups)) +
-  geom_boxplot(outlier.shape=NA) +
-  geom_jitter(alpha=0.5, width=0.2) +
+  ggplot2::ggplot(aes(groups, abundance_counts + 1, fill = groups)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(alpha = 0.5, width = 0.2) +
   scale_y_log10() +
-  facet_wrap(~transcript, scales="free_y") +
+  facet_wrap(~transcript, scales = "free_y") +
   custom_theme
 ```
 
@@ -1258,14 +1257,14 @@ We proceed with data processing with Bioconductor packages, such as *scran* [@lu
 
 ```{r preprocess}
 variable_genes <-
-    pbmc_small_polished %>%
-    modelGeneVar() %>%                 # from scran
-    getTopHVGs(prop=0.1)               # from scran
+  pbmc_small_polished %>%
+  modelGeneVar() %>% # from scran
+  getTopHVGs(prop = 0.1) # from scran
 
 # Perform PCA with scater
 pbmc_small_pca <-
-    pbmc_small_polished %>%
-    runPCA(subset_row=variable_genes)  # from scater
+  pbmc_small_polished %>%
+  runPCA(subset_row = variable_genes) # from scater
 
 pbmc_small_pca
 ```
@@ -1275,9 +1274,9 @@ If a tidyverse-compatible package is not included in the tidySingleCellExperimen
 ```{r pc_plot, message=FALSE}
 # Create pairs plot with GGally
 pbmc_small_pca %>%
-    as_tibble() %>%
-    GGally::ggpairs(columns=4:8, ggplot2::aes(colour=groups)) +
-    custom_theme
+  as_tibble() %>%
+  GGally::ggpairs(columns = 4:8, ggplot2::aes(colour = groups)) +
+  custom_theme
 ```
 
 
@@ -1287,8 +1286,8 @@ Beside PCA which is a linear dimensionality reduction, we can apply neighbour aw
 
 ```{r umap}
 pbmc_small_UMAP <-
-    pbmc_small_pca %>%
-    runUMAP(ncomponents=3)           # from scater
+  pbmc_small_pca %>%
+  runUMAP(ncomponents = 3) # from scater
 
 pbmc_small_UMAP
 ```
@@ -1300,14 +1299,14 @@ We can proceed with cluster identification with *scran*.
 ```{r cluster}
 pbmc_small_cluster <- pbmc_small_UMAP
 
-# Assign clusters to the 'colLabels' 
+# Assign clusters to the 'colLabels'
 # of the SingleCellExperiment object
-colLabels(pbmc_small_cluster) <-                                          # from SingleCellExperiment
-    pbmc_small_pca %>%
-    buildSNNGraph(use.dimred="PCA") %>%                                   # from scran - shared nearest neighbor
-    cluster_walktrap() %$%                                                # from igraph
-    membership %>%
-    as.factor()
+colLabels(pbmc_small_cluster) <- # from SingleCellExperiment
+  pbmc_small_pca %>%
+  buildSNNGraph(use.dimred = "PCA") %>% # from scran - shared nearest neighbor
+  cluster_walktrap() %$% # from igraph
+  membership %>%
+  as.factor()
 
 # Reorder columns
 pbmc_small_cluster %>% select(label, everything())
