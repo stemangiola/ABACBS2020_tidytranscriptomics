@@ -9,6 +9,9 @@ home:
   title: "TidyTranscriptomics"
   type: inverse
   
+toc:
+  depth: 4
+  
 navbar:
   title: ~
   type: default
