@@ -634,6 +634,32 @@ get_bibliography(counts_de)
 ```
 
 
+## Tidybulk ADD versus GET modes
+
+In the next parts we will see `action="get"` being used with some tidybulk functions, so we will explain here what it is doing.
+
+Every tidybulk function takes a tidybulk tibble as input, and  
+ * `action="add"` outputs the new information joined to the original input data frame (default)  
+ * `action="get"` outputs the new information with only the sample or transcript information, depending on what the analysis is
+ 
+For example, with `action="add"` (default), we can add the PCA dimensions to the original data set. So we still have a row for every transcript in every sample.
+
+```{r}
+counts_scaled %>%
+  reduce_dimensions(
+  method = "PCA",
+  action = "add")
+```
+
+Or with `action= "get"` we can add the PCA dimensions to the original data set selecting just the sample-wise columns. Note that we now have just one row for every sample.
+
+```{r}
+counts_scaled %>%
+  reduce_dimensions(
+  method = "PCA",
+  action = "get")
+```
+
 ## Cell type composition analysis
 
 If we are sequencing tissue samples, we may want to know what cell types are present and if there are differences in expression between them. `tidybulk` has a `deconvolve_cellularity` function that can help us do this.
