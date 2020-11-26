@@ -59,7 +59,8 @@ Imports:
     celldex,
     devtools,
     rlang,
-    magrittr
+    magrittr,
+    ggbeeswarm
 Suggests:
     knitr,
     rmarkdown,
