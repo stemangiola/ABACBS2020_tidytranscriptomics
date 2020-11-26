@@ -430,7 +430,7 @@ _Note: Some of the methods produce columns with different names for similar outp
 de_all %>% rename(deseq2_FDR = deseq2_padj, voom_FDR = voom_adj.P.Val)
 ```
 
-We can select some of the transcripts that look different between methods in the plot using the [*tidygate*](https://github.com/stemangiola/tidygate) package. We can then investigate these transcripts, for example, by visualising the their counts.
+We can select some of the transcripts that look different between methods in the plot using the [*tidygate*](https://github.com/stemangiola/tidygate) package. We can then investigate these transcripts, for example, by visualising their counts.
 
 With tidygate, we can interactively draw gates to select points we want using `gate`. We specify which columns we want to plot in the scatterplot, and how many gates we want to draw. We can also specify the opacity if we want to make it easier to see overlapping points.
 
@@ -452,6 +452,7 @@ We then click to draw gates around the points we want, for example as shown in t
 ```{r, echo=FALSE}
 knitr::include_graphics("../inst/vignettes/comparison_different_DE_methods_gates.png")
 ```
+
 That will add a column called gate, specifying which gate the points (transcripts) are in.
 
 ```{r echo=FALSE}
@@ -477,7 +478,7 @@ de_gate %>%
   count(gate)
 ```
 
-We can now select the transcripts from our two gates i.e. more significant in edgeR (gate 1) and more significant in DESeq2 (gate 2).
+We can now select the transcripts from our two gates i.e. more significant in edgeR (gate 1) and more significant in DESeq2 (gate 2) and visualise the counts for each sample in the treated and untreated groups.
 
 ```{r}
 de_gate %>%
@@ -498,11 +499,11 @@ de_gate %>%
   # Plot
   ggplot(aes(dex, counts_scaled, color = gate)) +
   geom_point() +
-  facet_wrap(~feature, scale = "free_y") +
+  facet_wrap(~feature, scale = "free_y", ncol = 4) +
   custom_theme
 ```
 
-This enables us to see, for example, that DESeq2 produces a more conservative logFC statistic for the gene `ENSG00000104725`.
+We could also check the log fold changes for these genes and see, for example, that DESeq2 produces a more conservative logFC statistic for the gene `ENSG00000104725`.
 
 ```{r}
 de_gate %>%
@@ -533,11 +534,10 @@ keep.exprs <- filterByExpr(dgList, group = group)
 dgList <- dgList[keep.exprs, , keep.lib.sizes = FALSE]
 dgList <- calcNormFactors(dgList)
 cell <- factor(dgList$samples$cell)
-design <- model.matrix(~ 0 + group + cell)
+design <- model.matrix(~ group + cell)
 dgList <- estimateDisp(dgList, design)
 fit <- glmQLFit(dgList, design)
-TvsU <- makeContrasts(TvsU = grouptrt - groupuntrt, levels = design)
-qlf <- glmQLFTest(fit, contrast = TvsU)
+qlf <- glmQLFTest(fit, coef=2)
 ```
 
 
@@ -810,13 +810,15 @@ pbmc_tidy
 
 **But it is a Seurat object after all**
 
+So it can be interacted with using [Seurat commands](https://rdrr.io/cran/Seurat/man/Assays.html) such as `Assays`.
+
 ```{r}
 Assays(pbmc_tidy)
 ```
 
 ## Polish the data
 
-We can interact with our object as we do with any tibble. In this case we want to polish an annotation column. We will extract the sample and dataset names from the file name column into separate columns.
+We can also interact with our object as we do with any tidyverse tibble. In this case we want to polish an annotation column. We will extract the sample and dataset names from the file name column into separate columns.
 
 ```{r}
 pbmc_tidy_clean <-
@@ -833,11 +835,10 @@ pbmc_tidy_clean
 
 ## Quality control
 
-A key quality control step performed in single cell analysis is assessment of the proportion of mitochondrial transcripts. A high mitochondrial count can indicate the cell is dead or dying and is thus poor quality. A powerful combination of tools we can use with tidyseurat is tidyverse's `nest` and `map`. We can easily perform independent analyses on subsets of the data, for example, we can nest by dataset and use map to iterate the analysis of mitochondrial content across each dataset.
+A key quality control step performed in single cell analysis is assessment of the proportion of mitochondrial transcripts. A high mitochondrial count can indicate the cell is dead or dying and is thus poor quality. A powerful combination of tools we can use with tidyseurat is tidyverse's [nest](https://rstudio-education.github.io/tidyverse-cookbook/transform-tables.html#nest-a-data-frame) and `map`. This enables us to easily perform independent analyses on subsets of the data. For example, we can nest by dataset and use map to iterate the analysis of mitochondrial content across each dataset.
 
 ```{r}
-
-# Gene product location
+# Get chromosomal location for gene symbols
 location <- mapIds(
   EnsDb.Hsapiens.v86,
   keys = rownames(pbmc_tidy_clean),
@@ -848,7 +849,7 @@ location <- mapIds(
 pbmc_annotated <-
   pbmc_tidy_clean %>%
 
-  # Grouping - nesting
+  # Grouping - nesting by dataset
   nest(data = -dataset) %>%
   mutate(data = map(
     data,
@@ -856,13 +857,13 @@ pbmc_annotated <-
     # Join mitochondrion statistics
     ~ left_join(
       .x,
-      # Calculating metrics
+      # # Calculate metrics for each cell
       perCellQCMetrics(.@assays$RNA@counts, subsets = list(Mito = which(location == "MT"))) %>%
         as_tibble(rownames = "cell"),
       by = "cell"
     ) %>%
 
-      # Label cells
+      # Label cells with high mitochondrial content
       mutate(high_mitochondrion = isOutlier(subsets_Mito_percent, type = "higher"))
   )) %>%
 
@@ -870,7 +871,7 @@ pbmc_annotated <-
   unnest(data)
 ```
 
-We can use tidyverse to easily reshape the data and create beeswarm plots to visualise the mitochondrial content. Detected is number of genes, sum is total counts.
+We can use tidyverse to reshape the data and create beeswarm plots to visualise the mitochondrial content. 
 
 ```{r}
 pbmc_annotated %>%
@@ -894,6 +895,9 @@ pbmc_annotated %>%
   theme_bw() +
   theme(axis.text.x = element_text(angle = 50, hjust = 1, vjust = 1))
 ```
+
+In the faceted plot, detected is number of genes in each of the 10 datasets, sum is total counts.
+
 ```{poll_5 class.source="poll"}
 What is the ID of the cell with the highest mitochondrial relative content?
 ```
@@ -909,7 +913,6 @@ pbmc_alive <- pbmc_annotated %>% filter(!high_mitochondrion)
 We need to integrate the different datasets to adjust for technical variability between them. For integration we have chosen 10x_8K (dataset number 3) as reference because it is relatively high quality.
 
 ```{r preprocess seurat, message=FALSE, warning=FALSE}
-
 # Scaling within each dataset
 pbmc_scaled_nested <-
   pbmc_alive %>%
@@ -922,7 +925,7 @@ pbmc_scaled_nested <-
   mutate(data = map(data, ~ SCTransform(.x, verbose = FALSE)))
 
 
-# Select features
+# Select features (genes)
 integration_features <- SelectIntegrationFeatures(pbmc_scaled_nested$data)
 
 
@@ -1041,11 +1044,12 @@ pbmc_cluster %>%
 We can infer cell type identities (e.g. T cell) using *SingleR* [@aran2019reference] and manipulate the output using tidyverse. SingleR [accepts any log-normalised transcript abundance matrix](https://bioconductor.org/packages/devel/bioc/vignettes/SingleR/inst/doc/SingleR.html)
 
 ```{r eval=FALSE}
+# Reference cell types
 blueprint <- BlueprintEncodeData()
 
 cell_type_df_seurat <-
 
-  # extracting counts from Seurat object
+  # Extracting counts from Seurat object
   pbmc_cluster@assays[["SCT"]]@counts %>%
   log1p() %>%
 
@@ -1087,13 +1091,13 @@ How many cells are classified differently by SingleR when analyses are done by c
 
 ## Pseudobulk analyses
 
-It is sometime useful to aggregate cell-wise transcript abundance into pseudobulk samples. It is possible to explore data and perform hypothesis testing with tools and data-source that we are more familiar with. For more details see [here](https://hbctraining.github.io/scRNA-seq/lessons/pseudobulk_DESeq2_scrnaseq.html).
+It is sometime useful to aggregate cell-wise transcript abundance into pseudobulk samples. It is possible to explore data and perform hypothesis testing with tools and data-source that we are more familiar with. For example, we can use edgeR in tidybulk to perform differential expression testing. For more details on pseudobulk analysis see [here](https://hbctraining.github.io/scRNA-seq/lessons/pseudobulk_DESeq2_scrnaseq.html).
 
 ### Data exploration using pseudobulk samples
 
-We load the `aggregate_cells` function below from [GitHub Gist](https://gist.github.com/stemangiola/ebce5a3f931b298611b56680d39c073c) and create a group for each sample.
-```{r}
+To do this, we will load a helper function called `aggregate_cells` from [GitHub Gist](https://gist.github.com/stemangiola/ebce5a3f931b298611b56680d39c073c) and use it to create a group for each sample.
 
+```{r}
 # Load aggregate function
 devtools::source_gist("ebce5a3f931b298611b56680d39c073c")
 
@@ -1195,6 +1199,8 @@ pbmc_small_tidy
 
 **But it is a SingleCellExperiment object after all**
 
+So it can be interacted with using [SingleCellExperiment commands](https://bioconductor.org/packages/release/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html) such as `assayNames`.
+
 ```{r}
 assayNames(pbmc_small_tidy) # from SummarizedExperiment
 ```
@@ -1218,14 +1224,14 @@ pbmc_small_polished
 
 ### Scaling
 
-We can treat `pbmc_small_polished` as a [*SingleCellExperiment* object](https://www.bioconductor.org/packages/release/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html) and calculate the log counts.
+We can treat `pbmc_small_polished` as a SingleCellExperiment object and calculate the log counts.
 
 ```{r}
-counts <- assay(pbmc_small_polished, "counts") # from SummarizedExperiment
+counts <- assay(pbmc_small_polished, "counts")
 libsizes <- colSums(counts)
 size.factors <- libsizes / mean(libsizes)
-logcounts(pbmc_small_polished) <- log2(t(t(counts) / size.factors) + 1) # from SingleCellExperiment
-assayNames(pbmc_small_polished) # from SummarizedExperiment
+logcounts(pbmc_small_polished) <- log2(t(t(counts) / size.factors) + 1)
+assayNames(pbmc_small_polished)
 ```
 
 ### Exploratory analyses
