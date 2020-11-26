@@ -1119,7 +1119,7 @@ bulk_scaled %>%
   tidybulk::keep_variable(sample, transcript, abundance_RNA_scaled, top = 500) %>%
 
   # Take all genes with PCA
-  tidybulk::reduce_dimensions(sample, transcript, abundance_RNA_scaled, method = "PCA", on = "get") %>%
+  tidybulk::reduce_dimensions(sample, transcript, abundance_RNA_scaled, method = "PCA", action = "get") %>%
   ggplot(aes(PC1, PC2, color = dataset, label = sample)) +
   geom_text() +
   custom_theme +
