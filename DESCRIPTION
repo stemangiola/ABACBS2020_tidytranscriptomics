@@ -24,6 +24,8 @@ Imports:
     tidyseurat,
     tidyHeatmap,
     tidySingleCellExperiment,
+    SingleCellExperiment,
+    SummarizedExperiment,
     stats,
     utils,
     tibble,
