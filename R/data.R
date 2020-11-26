@@ -32,14 +32,6 @@
 #' @usage data(pbmc_small_sce)
 "pbmc_small_sce"
 
-#' cell_type_df_seurat
-#'
-#' Stefano's cell type df for tidyseurat
-#'
-#' @format  A tibble containing two columns: seurat_clusters and first.labels
-#' @usage data(cell_type_df_seurat)
-"cell_type_df_seurat"
-
 #' cell_type_df_sce
 #'
 #' Stefano's cell type df for tidySingleCellExperiment
