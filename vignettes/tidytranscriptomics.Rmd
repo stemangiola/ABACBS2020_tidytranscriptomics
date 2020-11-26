@@ -1043,7 +1043,7 @@ pbmc_cluster %>%
 
 We can infer cell type identities (e.g. T cell) using *SingleR* [@aran2019reference] and manipulate the output using tidyverse. SingleR [accepts any log-normalised transcript abundance matrix](https://bioconductor.org/packages/devel/bioc/vignettes/SingleR/inst/doc/SingleR.html)
 
-```{r eval=FALSE}
+```{r}
 # Reference cell types
 blueprint <- BlueprintEncodeData()
 
