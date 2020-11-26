@@ -873,7 +873,7 @@ pbmc_annotated <-
 
 We can use tidyverse to reshape the data and create beeswarm plots to visualise the mitochondrial content. 
 
-```{r}
+```{r, warning=FALSE}
 pbmc_annotated %>%
 
   # Reshaping
@@ -953,7 +953,7 @@ pbmc_integrated <-
 
 Besides PCA which is a linear dimensionality reduction, we can apply neighbour aware methods such as UMAP, to better define locally similar cells. We can calculate the first 3 UMAP dimensions using the Seurat framework.
 
-```{r umap seurat}
+```{r umap seurat, warning=FALSE}
 pbmc_UMAP <-
   pbmc_integrated %>%
   RunPCA(verbose = FALSE) %>%
@@ -1097,7 +1097,7 @@ It is sometime useful to aggregate cell-wise transcript abundance into pseudobul
 
 To do this, we will load a helper function called `aggregate_cells` from [GitHub Gist](https://gist.github.com/stemangiola/ebce5a3f931b298611b56680d39c073c) and use it to create a group for each sample.
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 # Load aggregate function
 devtools::source_gist("ebce5a3f931b298611b56680d39c073c")
 
@@ -1119,7 +1119,7 @@ bulk_scaled %>%
   tidybulk::keep_variable(sample, transcript, abundance_RNA_scaled, top = 500) %>%
 
   # Take all genes with PCA
-  tidybulk::reduce_dimensions(sample, transcript, abundance_RNA_scaled, method = "PCA", on = "get") %>%
+  tidybulk::reduce_dimensions(sample, transcript, abundance_RNA_scaled, method = "PCA", action = "get") %>%
   ggplot(aes(PC1, PC2, color = dataset, label = sample)) +
   geom_text() +
   custom_theme +
@@ -1130,7 +1130,7 @@ bulk_scaled %>%
 
 We aggregate by sample name and cell type to perform differential expression analysis, comparing pseudo-samples independently for each cell type.. 
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 bulk_cell_type <-
   pbmc_cell_type %>%
   aggregate_cells(c(sample, first.labels))
@@ -1266,7 +1266,7 @@ pbmc_small_polished_abundance %>%
 
 We proceed with data processing with Bioconductor packages, such as *scran* [@lun2016pooling] and *scater* [@mccarthy2017scater].
 
-```{r preprocess}
+```{r preprocess, warning=FALSE}
 variable_genes <-
   pbmc_small_polished %>%
   modelGeneVar() %>% # from scran
