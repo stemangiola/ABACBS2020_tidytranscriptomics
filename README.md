@@ -31,7 +31,7 @@ This is necessary in order to reproduce the code shown in the workshop. The work
 If you're familiar with [Docker](https://docs.docker.com/get-docker/) you could use the Docker image which has all the software pre-configured to the correct versions.
 
 ```
-docker run -e PASSWORD=abc -p 8787:8787 stemangiola/ABACBS2020_tidytranscriptomics:ABACBS2020
+docker run -e PASSWORD=abc -p 8787:8787 stemangiola/abacbs2020_tidytranscriptomics:abacbs2020
 ```
 
 Once running, navigate to <http://localhost:8787/> and then login with
